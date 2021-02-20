@@ -64,6 +64,7 @@ class Game():
       S.mat_last = S.mat
       S.alpha = 0.0
       S.beta = 0.0
+      S.gamma = 0.0
       S.delta = 6
 
    def GRID_X(S): return S.grid_x
@@ -106,6 +107,7 @@ class Game():
       S.mat_last = S.mat
       S.alpha = 0.0
       S.beta = 0.0
+      S.gamma = 0.0
    def SET_STATUS_SHIFT(S,shift):
       S.shift=shift
       S.rot_alpha=0
@@ -143,19 +145,28 @@ class Game():
                   step = S.steps[len(S.steps)-1]
                   S.ROTADE_SIDE(step)
          else:
-            if not S.rot_alpha and S.shift:
-               if mouse_move[0]*mouse_move[0] > mouse_move[1]*mouse_move[1]:
-                  S.rot_alpha = 1
-               elif mouse_move[0]*mouse_move[0] < mouse_move[1]*mouse_move[1]:
-                  S.rot_alpha = -1
-            S.ROT(mouse_move)
+            dx = mouse[0] -S.mid[0]
+            dy = mouse[1] -S.mid[1]
+            if dx*dx + dy*dy > 200*200 and S.rot_alpha == 0:
+               S.rot_alpha = 3
+               S.ROT(mouse_move)
+               S.rot_alpha = 0
+            else:
+               if not S.rot_alpha and S.shift:
+                  if mouse_move[0]*mouse_move[0] > mouse_move[1]*mouse_move[1]:
+                     S.rot_alpha = 1
+                  elif mouse_move[0]*mouse_move[0] < mouse_move[1]*mouse_move[1]:
+                     S.rot_alpha = 2
+               S.ROT(mouse_move)
       return
 
    def ROT(S,mv):
-      if S.rot_alpha >= 0:
+      if S.rot_alpha == 0 or S.rot_alpha == 1:
          S.alpha = S.alpha+2.0*float(mv[0])/S.size_x*M.pi
-      if S.rot_alpha <= 0:
+      if S.rot_alpha == 0 or S.rot_alpha == 2:
          S.beta  = S.beta+2.0*float(mv[1])/S.size_y*M.pi
+      if S.rot_alpha == 3 :
+         S.gamma  = S.gamma+2.0*float(mv[1])/S.size_y*M.pi
       rot_x = np.zeros((3,3), np.float)
       rot_x[1][1]= rot_x[2][2]=M.cos(S.beta)
       rot_x[1][2]=M.sin(S.beta)
@@ -167,7 +178,13 @@ class Game():
       rot_y[0][0]= rot_y[2][2]=M.cos(S.alpha)
       rot_y[0][2]=M.sin(S.alpha)
       rot_y[2][0]= -rot_y[0][2]
-      S.mat = rot_x.dot(rot_y.dot(S.mat_last)) 
+
+      rot_z = np.zeros((3,3), np.float)
+      rot_z[2][2]= 1.0
+      rot_z[0][0]= rot_z[1][1]=M.cos(S.gamma)
+      rot_z[0][1]=M.sin(S.gamma)
+      rot_z[1][0]= -rot_z[0][1]
+      S.mat = rot_x.dot(rot_y.dot(rot_z.dot(S.mat_last))) 
       return
 
    def GET_SIDE(S,mouse,mouse_move):
@@ -448,8 +465,10 @@ def RubikDodekaeder():
       if event.type == 768: # Key pressed
          print ("Key pressed")
          print (pygame.key.get_mods())
-         print (event.type)
-         print (event.key, event.unicode)
+         taste = pygame.key.name(event.key)
+         print (taste)
+         if taste == 'f1' : #r
+               print ('Hilfe Text')
          if pygame.key.get_mods() & pygame.KMOD_SHIFT: 
             print ("shift pressed")
             game.SET_STATUS_SHIFT(True)
@@ -457,19 +476,19 @@ def RubikDodekaeder():
             print ("strg pressed")
             print (event.key)
             game.SET_STATUS_STRG(True)
-            if event.key == 120:
+            if taste == 'x':
                game.STRG_X()
                game.PLOT()
-            elif event.key == 122:
+            elif taste == 'z':
                game.STRG_Z()
                game.PLOT()
-            elif event.key == 115 : #s
+            elif taste == 's' : #s
                print ('SAVE_STEPS')
                game.SAVE()
-            elif event.key == 114 : #r
+            elif taste == 'r' : #r
                print ('Read Session')
                game.READ()
-            elif 49 <= event.key and event.key <= 57 : #r
+            elif 49 <= event.key and event.key <= 57 : #ziffer 1-9
                print ('RANDOM')
                game.RANDOM( event.key-47 )
 
