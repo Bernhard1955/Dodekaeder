@@ -66,6 +66,7 @@ class Game():
       S.beta = 0.0
       S.gamma = 0.0
       S.delta = 6
+      S.help = False
 
    def GRID_X(S): return S.grid_x
    def GRID_Y(S): return S.grid_y
@@ -149,7 +150,7 @@ class Game():
             dy = mouse[1] -S.mid[1]
             if dx*dx + dy*dy > 200*200 and S.rot_alpha == 0:
                S.rot_alpha = 3
-               S.ROT(mouse_move)
+               S.ROT(mouse, mouse_move)
                S.rot_alpha = 0
             else:
                if not S.rot_alpha and S.shift:
@@ -157,16 +158,19 @@ class Game():
                      S.rot_alpha = 1
                   elif mouse_move[0]*mouse_move[0] < mouse_move[1]*mouse_move[1]:
                      S.rot_alpha = 2
-               S.ROT(mouse_move)
+               S.ROT(mouse, mouse_move)
       return
 
-   def ROT(S,mv):
+   def ROT(S,mouse, mv):
       if S.rot_alpha == 0 or S.rot_alpha == 1:
          S.alpha = S.alpha+2.0*float(mv[0])/S.size_x*M.pi
       if S.rot_alpha == 0 or S.rot_alpha == 2:
          S.beta  = S.beta+2.0*float(mv[1])/S.size_y*M.pi
       if S.rot_alpha == 3 :
-         S.gamma  = S.gamma+2.0*float(mv[1])/S.size_y*M.pi
+         delta  = 2.0*M.sqrt(float(mv[1]*mv[1]+mv[0]*mv[0]))/S.size_y*M.pi
+         if ( (mouse[0]-S.mid[0])*mv[1] - (mouse[1]-S.mid[1])*mv[0] ) > 0:
+            delta = -delta
+         S.gamma +=delta   
       rot_x = np.zeros((3,3), np.float)
       rot_x[1][1]= rot_x[2][2]=M.cos(S.beta)
       rot_x[1][2]=M.sin(S.beta)
@@ -419,8 +423,24 @@ class Game():
             S.ROTADE_SIDE(step)
       S.delta = delta
 
+   def HELP(S, val):
+      S.help = val
+      print ('S.help', S.help)
    def PLOT_TEXT(S):
-      Font =  pygame.freetype.Font(None, 20)
+      #2Font =  pygame.freetype.Font(None, 20)
+      if S.help:
+         line = 25
+         font = pygame.font.SysFont('arial',18)
+         text = font.render('Dodekaeder Hilfe',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         font = pygame.font.SysFont('arial',14)
+         line += 20
+         text = font.render('Linke Maustaste gedrückt Rotieren',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
+         text = font.render('mit größer kann Rot-Achse geklemmt werden',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
 
 def RubikDodekaeder():
 
@@ -468,7 +488,10 @@ def RubikDodekaeder():
          taste = pygame.key.name(event.key)
          print (taste)
          if taste == 'f1' : #r
-               print ('Hilfe Text')
+            game.HELP(True)
+            game.PLOT()
+            game.HELP(False)
+            print ('Hilfe Text')
          if pygame.key.get_mods() & pygame.KMOD_SHIFT: 
             print ("shift pressed")
             game.SET_STATUS_SHIFT(True)
@@ -496,10 +519,11 @@ def RubikDodekaeder():
          print ("Key released")
          print (pygame.key.get_mods())
          print (event.type)
-         if pygame.key.get_mods() == 4096: 
-            print ("shift released")
-            game.SET_STATUS_SHIFT(False)
-            game.SET_STATUS_STRG(False)
+         taste = pygame.key.name(event.key)
+         print (taste)
+         print ("shift released")
+         game.SET_STATUS_SHIFT(False)
+         game.SET_STATUS_STRG(False)
 
       if button_pressed[0] or button_pressed[1] or button_pressed[2]:
          game.MOUSE_MOVE(mouse, mouse_move)
