@@ -425,9 +425,7 @@ class Game():
 
    def HELP(S, val):
       S.help = val
-      print ('S.help', S.help)
    def PLOT_TEXT(S):
-      #2Font =  pygame.freetype.Font(None, 20)
       if S.help:
          line = 25
          font = pygame.font.SysFont('arial',18)
@@ -438,7 +436,31 @@ class Game():
          text = font.render('Linke Maustaste gedrückt Rotieren',1,(255,255,255))
          S.screen.blit(text, (50, line))
          line += 20
-         text = font.render('mit größer kann Rot-Achse geklemmt werden',1,(255,255,255))
+         text = font.render('mit SHIFT kann Rot-Achse geklemmt werden',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
+         text = font.render('STRG und LMB Dodekaeder Seiten drehen',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
+         text = font.render('bunte Kreise am Unteren Rand mit LMB oder RMB anklicken rotiert entsprechned Seit des Dodekaeders',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
+         text = font.render('Druecken von roten Button links oben Zugfolge aufzeichnen starten, erneutes druecken benden',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
+         text = font.render('STRG+s, Aufzeichnung speichern',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
+         text = font.render('STRG+r, Aufzeichnung einlesen',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
+         text = font.render('Blaue Pfeile Zugfolge anwenden',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
+         text = font.render('STG+z oder blauer Pfeil oben rechts 1 Zug zurueck',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
+         text = font.render('STG+x oder rotes Kreuz oben rechts Reset',1,(255,255,255))
          S.screen.blit(text, (50, line))
          line += 20
 
