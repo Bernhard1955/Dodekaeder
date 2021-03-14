@@ -16,8 +16,9 @@ import random
 import numpy as np
 from Dodekaeder import Dodekaeder
 
-class Game():
-   def INIT(S, sc, rubik):
+class Eventhandling():
+   def INIT(S, sc, rubik,verbose):
+      S.V = verbose
       S.mouse_pressed=False
       S.mouse_moved=False
       S.shift=False
@@ -30,16 +31,17 @@ class Game():
       S.record = 0
       S.store = []
       S.rs = -1
+      S.strg_c = []
 
       S.farben = []
-      S.farben.append(pygame.Color(128,0,0))
+      S.farben.append(pygame.Color(192,0,0))
       S.farben.append(pygame.Color(255,255,0))
       S.farben.append(pygame.Color(0,0,127))
-      S.farben.append(pygame.Color(0,64,0))
-      S.farben.append(pygame.Color(128,0  ,127))
-      S.farben.append(pygame.Color(64,64,64))
+      S.farben.append(pygame.Color(0,64,32))
+      S.farben.append(pygame.Color(160,0  ,160))
+      S.farben.append(pygame.Color(96,96,96))
 
-      S.farben.append(pygame.Color(64,127,255))
+      S.farben.append(pygame.Color(64,96,255))
       S.farben.append(pygame.Color(255,255,255))
       S.farben.append(pygame.Color(64,255,64))
       S.farben.append(pygame.Color(255,127,127))
@@ -65,7 +67,7 @@ class Game():
       S.alpha = 0.0
       S.beta = 0.0
       S.gamma = 0.0
-      S.delta = 6
+      S.delta = 24
       S.help = False
 
    def GRID_X(S): return S.grid_x
@@ -78,7 +80,7 @@ class Game():
          with open(file_path_string, 'w') as f :
             json.dump([S.steps, S.store], f)
       except :
-         print ('File open failed')
+         if S.V : print ('File open failed')
 
 
    def READ(S):
@@ -88,7 +90,7 @@ class Game():
          with open(file_path_string, 'r') as f :
             S.steps, S.store = json.load(f)
       except :
-         print ('File open failed')
+         if S.V : print ('File open failed')
       S.PLOT()   
       return
 
@@ -98,7 +100,6 @@ class Game():
          step[0] = random.randint(0, 11)
          step[1] = random.randint(0, 1)*2 -1
          S.ROTADE_SIDE(step)
-     
 
    def SET_STATUS_MP(S,mp):
       if S.mouse_pressed != mp:
@@ -114,6 +115,66 @@ class Game():
       S.rot_alpha=0
    def SET_STATUS_STRG(S,strg):
       S.strg = strg
+   def STRG_C(S,mouse):
+      print('STRG_C ', mouse)
+      i0,j0 = S.GET_PLG(mouse)
+      S.strg_c = []
+      if S.V : print('i0= ',i0,', j0= ',j0)
+      ij = S.GET_NEIGHB(i0,j0)
+      S.strg_c = ij
+      print('STRG_C ij= ',ij)
+
+   def STRG_V(S,mouse):
+      print('STRG_V ', mouse)
+      i0,j0 = S.GET_PLG(mouse)
+      ij = S.GET_NEIGHB(i0,j0)
+      print('STRG_V ij ',ij)
+      print('STRG_V S.strg_c', S.strg_c)
+      pg=S.rubik.get_plgs()
+      plgtmp = []
+      if len(ij) == len(S.strg_c):
+         for i0j0 in ij : 
+            print ('i0j0', i0j0)
+            plgtmp.append(pg[i0j0[0]][i0j0[1]])
+         for i in range(len(ij)):
+            print( 'ij[i], S.strg_c[i],i',ij[i], S.strg_c[i],i)
+            pg[ij[i][0]][ij[i][1]] = pg[S.strg_c[i][0]][S.strg_c[i][1]]
+         for i in range(len(ij)):
+            pg[S.strg_c[i][0]][S.strg_c[i][1]] = plgtmp[i]
+      S.strg_c=[]
+
+      
+
+   def GET_PLG(S,mouse):
+      pg = S.rubik.get_plgs()
+      for i in range(len(pg)):
+         for j in range(len(pg[i])):
+            if S.TO_PAINT(pg[i][j]) :
+               pg2d = S.PLG2D(pg[i][j])   
+               if S.IN_PLG(mouse, pg2d) :
+                  if S.V : print('i= ',i,', j= ',j)
+                  if S.V : print(pg[i][j])
+                  return i, j        
+      return -1, -1
+   
+   def GET_NEIGHB(S,i0,j0):
+      pg = S.rubik.get_plgs()
+      test_plg = pg[i0][j0]
+      ij=[]
+      ij.append([i0,j0])
+      for i in range(len(pg)):
+         #if i0 != i:
+            for j in range(len(pg[i])-1): # Polygon in der Mitte weglassen
+               for k in range(len(pg[i][j])-1):
+                  for l in range(len(pg[i0][j0])-1):
+                     diff = (pg[i][j][k]+pg[i][j][k+1])-(pg[i0][j0][l]+pg[i0][j0][l+1])
+                     dist = np.inner(diff,diff)
+                     if dist < 0.01 and j0%2 == j%2 and (i0 != i or j0 != j):
+                        ij.append([i,j])
+                        if S.V : print('dist= ', dist, 'ij ',ij)
+      if S.V : print (ij)
+      return ij
+   
    def STRG_Z(S):
       if len(S.steps):
          angle = S.rubik.get_angle()
@@ -125,7 +186,7 @@ class Game():
       S.rubik.reset()
 
    def ROTADE_SIDE(S, step):
-      print ('ROTADE_SIDE')
+      if S.V : print ('ROTADE_SIDE')
       delta = S.delta
       angle = S.rubik.get_angle()
       da = angle/delta
@@ -141,7 +202,7 @@ class Game():
          if S.strg and S.mouse_pressed:
             if S.do_rot_side:
                S.do_rot_side = False
-               print ( 'do_rot_side')
+               if S.V : print ( 'do_rot_side')
                if S.GET_SIDE(mouse, mouse_move):
                   step = S.steps[len(S.steps)-1]
                   S.ROTADE_SIDE(step)
@@ -234,13 +295,6 @@ class Game():
       pt = [int( S.mid[0]+pt3d[0]*S.scale),int(S.mid[1]+pt3d[1]*S.scale)]
       return pt
 
-   def PLG2D(S,plg3d):
-      pg2d = []
-      for pt in plg3d:
-         PT2D = S.PT2D(pt)
-         pg2d.append( PT2D ) 
-      return pg2d
-
    def IN_PLG(S,m,pg2d):
       last = 0
       for i in range(0,len(pg2d)) :
@@ -256,9 +310,7 @@ class Game():
    def PLOT(S):
       S.screen.fill((0,20,60))
       plgs = S.rubik.get_plgs()
-      centers = S.rubik.get_centers()
-      for i in range(0,len(plgs)):
-         S.PLOT_PG(plgs,centers[i])
+      S.PLOT_PG(plgs)
       S.PLOT_STEPS()
       S.PLOT_STATUS()
       S.PLOT_TEXT()
@@ -316,20 +368,17 @@ class Game():
          pygame.draw.polygon(S.screen, farbe, pg2d, 0)
 
 
-   def PLOT_PG(S, pg, normal):
+   def PLOT_PG(S, pg):
       schwarz = pygame.Color(0,0,0)
-      normal = S.mat.dot(normal)
-      #if normal[0] > 0 :
-      if True :
-         i=0
-         for plgs in pg:
-            color = S.farben[i]
-            i +=1
-            for plg3d in plgs:
-               if S.TO_PAINT(plg3d) :
-                  pg2d = S.PLG2D(plg3d)   
-                  pygame.draw.polygon(S.screen, color, pg2d, 0)
-                  pygame.draw.polygon(S.screen, schwarz, pg2d, 4)
+      i=0
+      for plgs in pg:
+         color = S.farben[i]
+         i +=1
+         for plg3d in plgs:
+            if S.TO_PAINT(plg3d) :
+               pg2d = S.PLG2D(plg3d)   
+               pygame.draw.polygon(S.screen, color, pg2d, 0)
+               pygame.draw.polygon(S.screen, schwarz, pg2d, 4)
       
    def PLOT_STEPS(S):
       dx =  S.grid_x
@@ -358,7 +407,7 @@ class Game():
          pygame.draw.circle(S.screen, S.farben[step[0]], center, r)
 
    def CONTROL(S, mouse, button):
-      print ('CONTROL ', mouse)
+      if S.V : print ('CONTROL ', mouse)
       if ( mouse[1] > S.grid_y and mouse[1] < S.size_y-S.grid_y):
          return False
       if button[1] : return false
@@ -367,11 +416,11 @@ class Game():
          if ( mouse[0] < S.grid_x ):
             if not S.record: # 
                S.record = True # start recoder 
-               print ('start Record')
+               if S.V : print ('start Record')
                S.rs = len(S.steps)
             else:
                S.record = False # end record
-               print ('end Record')
+               if S.V : print ('end Record')
                if ( S.steps[S.rs:]):
                   S.store.append(S.steps[S.rs:])
                   steps = copy.deepcopy(S.steps[S.rs:])
@@ -392,7 +441,7 @@ class Game():
             if button[0]:
                S.PLAY_STEPS(mouse[0])
             else:
-               print ('color edit')
+               if S.V : print ('color edit')
          S.PLOT()
          return True
       else:
@@ -412,11 +461,11 @@ class Game():
       return False
 
    def PLAY_STEPS(S, x=0):
-      print ('PLAY_STEPS ',x)
+      if S.V : print ('PLAY_STEPS ',x)
       stp = int(x/S.grid_x -1)
       angle = S.rubik.get_angle()
       delta = S.delta
-      S.delta = 3
+      S.delta = 12
       if (len(S.store) > stp):
          for step in  S.store[stp]:
             #S.rubik.rotate_side(step[0],step[1],angle)
@@ -429,7 +478,7 @@ class Game():
       if S.help:
          line = 25
          font = pygame.font.SysFont('arial',18)
-         text = font.render('Dodekaeder Hilfe',1,(255,255,255))
+         text = font.render('Dodekaeder Hilfe (F1)',1,(255,255,255))
          S.screen.blit(text, (50, line))
          font = pygame.font.SysFont('arial',14)
          line += 20
@@ -463,101 +512,3 @@ class Game():
          text = font.render('STG+x oder rotes Kreuz oben rechts Reset',1,(255,255,255))
          S.screen.blit(text, (50, line))
          line += 20
-
-def RubikDodekaeder():
-
-   pygame.init()
-   size_x=1200
-   size_y=800
-   screensize = (size_x,size_y)
-   screen = pygame.display.set_mode(screensize)
-   game = Game()
-   rubik = Dodekaeder()
-   rubik.init()
-   game.INIT(screen,rubik)
-
-   game.PLOT()
-
-   #pygame.display.flip()
-
-   mouse_pressed = False
-   aufzeichnung =False
-
-   while True:
-      event = pygame.event.wait()##.type == KEYDOWN or MOUSEBUTTONDOWN or QUIT
-      if event.type == QUIT:
-         pygame.quit()
-         return
-
-      mouse = pygame.mouse.get_pos()
-      mouse_move = pygame.mouse.get_rel()
-      button_pressed = pygame.mouse.get_pressed()
-
-      if event.type == 1025: # Button pressed
-         mouse_pressed = True
-         game.SET_STATUS_MP(mouse_pressed)
-         print ("mouse button pressed")
-         if game.CONTROL(mouse, button_pressed):
-            continue
-      if event.type == 1026: # Button released
-         mouse_pressed = False
-         game.SET_STATUS_MP(mouse_pressed)
-         print ("mouse button released")
-         continue
-      if event.type == 768: # Key pressed
-         print ("Key pressed")
-         print (pygame.key.get_mods())
-         taste = pygame.key.name(event.key)
-         print (taste)
-         if taste == 'f1' : #r
-            game.HELP(True)
-            game.PLOT()
-            game.HELP(False)
-            print ('Hilfe Text')
-         if pygame.key.get_mods() & pygame.KMOD_SHIFT: 
-            print ("shift pressed")
-            game.SET_STATUS_SHIFT(True)
-         if pygame.key.get_mods()  & pygame.KMOD_CTRL: 
-            print ("strg pressed")
-            print (event.key)
-            game.SET_STATUS_STRG(True)
-            if taste == 'x':
-               game.STRG_X()
-               game.PLOT()
-            elif taste == 'z':
-               game.STRG_Z()
-               game.PLOT()
-            elif taste == 's' : #s
-               print ('SAVE_STEPS')
-               game.SAVE()
-            elif taste == 'r' : #r
-               print ('Read Session')
-               game.READ()
-            elif 49 <= event.key and event.key <= 57 : #ziffer 1-9
-               print ('RANDOM')
-               game.RANDOM( event.key-47 )
-
-      if event.type == 769: # Key released
-         print ("Key released")
-         print (pygame.key.get_mods())
-         print (event.type)
-         taste = pygame.key.name(event.key)
-         print (taste)
-         print ("shift released")
-         game.SET_STATUS_SHIFT(False)
-         game.SET_STATUS_STRG(False)
-
-      if button_pressed[0] or button_pressed[1] or button_pressed[2]:
-         game.MOUSE_MOVE(mouse, mouse_move)
-         game.PLOT()
-
-if __name__ == "__main__":
-
-   parser = optparse.OptionParser(usage="usage: %prog  ")
-   (options, args) = parser.parse_args()
-
-   print('*********************** **')
-   print('*  options     *')
-   print(options, args)
-   
-   RubikDodekaeder()
