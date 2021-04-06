@@ -13,6 +13,12 @@ def to_rot(plg,vec):
    return val > 1.5
 
 def rotate(p,v, sig, angle):
+   #
+   #rot_z = np.zeros((3,3), np.float)
+   #rot_z[0][0]= rot_z[1][1]=M.cos(S.gamma)
+   #rot_z[0][1]=M.sin(S.gamma)
+   #rot_z[1][0]= -rot_z[0][1]
+   #rot_z[2][2]= 1.0
    pp = pygame.math.Vector3(p[0],p[1],p[2])
    vv = pygame.math.Vector3(v[0],v[1],v[2])
    vv.normalize()

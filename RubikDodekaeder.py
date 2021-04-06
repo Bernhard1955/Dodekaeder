@@ -87,7 +87,7 @@ def RubikDodekaeder(verbose):
                game.STRG_V(mouse)
                game.PLOT()
             if taste == 'x':
-               game.STRG_V()
+               game.STRG_X()
                game.PLOT()
             elif taste == 'z':
                game.STRG_Z()
@@ -95,7 +95,7 @@ def RubikDodekaeder(verbose):
             elif taste == 's' : #s
                if V: print ('SAVE_STEPS')
                game.SAVE()
-            elif taste == 'r' : #r
+            elif taste == 'o' : #r
                if V: print ('Read Session')
                game.READ()
             elif 49 <= event.key and event.key <= 57 : #ziffer 1-9

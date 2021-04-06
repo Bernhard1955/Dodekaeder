@@ -55,8 +55,8 @@ class Eventhandling():
       S.mid = [float(S.size_x)/2.0, float(S.size_y)/2.0 ]
       S.size = float(min(S.size_x, S.size_y))
       S.scale = 0.15*S.size
-      S.grid_x =  40 #S.size_x/20
-      S.grid_y =  40 #S.size_y/20
+      S.grid_x =  35 #S.size_x/20
+      S.grid_y =  35 #S.size_y/20
 
       S.status_line = pygame.Surface((S.size_x, S.size_y/S.grid_y))
 
@@ -91,6 +91,7 @@ class Eventhandling():
             S.steps, S.store = json.load(f)
       except :
          if S.V : print ('File open failed')
+      print (S.store)
       S.PLOT()   
       return
 
@@ -125,19 +126,20 @@ class Eventhandling():
       print('STRG_C ij= ',ij)
 
    def STRG_V(S,mouse):
-      print('STRG_V ', mouse)
+      if S.V: print('STRG_V ', mouse)
       i0,j0 = S.GET_PLG(mouse)
       ij = S.GET_NEIGHB(i0,j0)
       print('STRG_V ij ',ij)
-      print('STRG_V S.strg_c', S.strg_c)
+      if S.V: print('STRG_V ij ',ij)
+      if S.V: print('STRG_V S.strg_c', S.strg_c)
       pg=S.rubik.get_plgs()
       plgtmp = []
       if len(ij) == len(S.strg_c):
          for i0j0 in ij : 
-            print ('i0j0', i0j0)
+            if S.V: print ('i0j0', i0j0)
             plgtmp.append(pg[i0j0[0]][i0j0[1]])
          for i in range(len(ij)):
-            print( 'ij[i], S.strg_c[i],i',ij[i], S.strg_c[i],i)
+            if S.V: print( 'ij[i], S.strg_c[i],i',ij[i], S.strg_c[i],i)
             pg[ij[i][0]][ij[i][1]] = pg[S.strg_c[i][0]][S.strg_c[i][1]]
          for i in range(len(ij)):
             pg[S.strg_c[i][0]][S.strg_c[i][1]] = plgtmp[i]
@@ -385,6 +387,8 @@ class Eventhandling():
       x = 2*dx
       S.plot_steps(S.steps, S.size_x)
       if S.record : S.plot_steps(S.steps[S.rs:], dx)
+      if len(S.store) > 0 :
+         if S.V: print ( 'print len(S.store)', len(S.store[0]))
       for  steps in S.store:
          S.plot_steps(steps, x)
          x += dx
@@ -395,15 +399,18 @@ class Eventhandling():
       xr = x -0.5*dx
       ys = S.grid_y
       r = 0.4*dy
-      nmin= max(len(steps)-35,0)
-      nmax= max(len(steps),0)
-      stps = steps[nmin:nmax]
+      #nmin= max(len(steps)-35,0)
+      #nmax= max(len(steps),0)
+      #stps = steps[nmin:nmax]
    
-      for step in stps:
+      if S.V: print ( 'print len(stps)', len(steps))
+      if S.V: print (steps)
+      for step in steps:
          if step[1] == -1: x=xl
          else: x=xr
          ys +=dy
          center = (x, ys)
+         if S.V: print( 'step= ', step, 'center= ', center)
          pygame.draw.circle(S.screen, S.farben[step[0]], center, r)
 
    def CONTROL(S, mouse, button):
@@ -500,7 +507,7 @@ class Eventhandling():
          text = font.render('STRG+s, Aufzeichnung speichern',1,(255,255,255))
          S.screen.blit(text, (50, line))
          line += 20
-         text = font.render('STRG+r, Aufzeichnung einlesen',1,(255,255,255))
+         text = font.render('STRG+o, Aufzeichnung einlesen',1,(255,255,255))
          S.screen.blit(text, (50, line))
          line += 20
          text = font.render('Blaue Pfeile Zugfolge anwenden',1,(255,255,255))
