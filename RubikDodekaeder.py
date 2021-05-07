@@ -120,12 +120,11 @@ if __name__ == "__main__":
 
    parser = optparse.OptionParser(usage="usage: %prog  ")
    parser.add_option(
-      "-v", action="store_true", dest="verbose", default=False, help="silent mode, default = False")
+      "-v", action="store_true", dest="verbose", default=False, help="verbose mode, default = False")
    (options, args) = parser.parse_args()
 
 
    verbose = options.verbose
-   if verbose == True: print("verbose, ", verbose)
    print(options, args)
    
    RubikDodekaeder( verbose)

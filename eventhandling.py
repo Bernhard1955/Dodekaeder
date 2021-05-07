@@ -133,16 +133,24 @@ class Eventhandling():
       if S.V: print('STRG_V ij ',ij)
       if S.V: print('STRG_V S.strg_c', S.strg_c)
       pg=S.rubik.get_plgs()
-      plgtmp = []
       if len(ij) == len(S.strg_c):
-         for i0j0 in ij : 
-            if S.V: print ('i0j0', i0j0)
-            plgtmp.append(pg[i0j0[0]][i0j0[1]])
          for i in range(len(ij)):
             if S.V: print( 'ij[i], S.strg_c[i],i',ij[i], S.strg_c[i],i)
-            pg[ij[i][0]][ij[i][1]] = pg[S.strg_c[i][0]][S.strg_c[i][1]]
-         for i in range(len(ij)):
-            pg[S.strg_c[i][0]][S.strg_c[i][1]] = plgtmp[i]
+            if len(ij) == 2 or i == 0:
+               tmp = pg[ij[i][0]][ij[i][1]]
+               pg[ij[i][0]][ij[i][1]] = pg[S.strg_c[i][0]][S.strg_c[i][1]]
+               pg[S.strg_c[i][0]][S.strg_c[i][1]] = tmp
+            else:
+               if ij[i][2] == S.strg_c[i][2] :
+                  tmp = pg[ij[i][0]][ij[i][1]]
+                  pg[ij[i][0]][ij[i][1]] = pg[S.strg_c[i][0]][S.strg_c[i][1]]
+                  pg[S.strg_c[i][0]][S.strg_c[i][1]] = tmp
+               else:
+                  if i+1 < len(ij): i1=i+1
+                  else: i1=i-1
+                  tmp = pg[ij[i1][0]][ij[i1][1]]
+                  pg[ij[i1][0]][ij[i1][1]] = pg[S.strg_c[i][0]][S.strg_c[i][1]]
+                  pg[S.strg_c[i][0]][S.strg_c[i][1]] = tmp
       S.strg_c=[]
 
       
@@ -172,7 +180,7 @@ class Eventhandling():
                      diff = (pg[i][j][k]+pg[i][j][k+1])-(pg[i0][j0][l]+pg[i0][j0][l+1])
                      dist = np.inner(diff,diff)
                      if dist < 0.01 and j0%2 == j%2 and (i0 != i or j0 != j):
-                        ij.append([i,j])
+                        ij.append([i,j,k,l])
                         if S.V : print('dist= ', dist, 'ij ',ij)
       if S.V : print (ij)
       return ij
