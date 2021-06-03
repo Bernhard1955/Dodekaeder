@@ -28,7 +28,7 @@ def RubikDodekaeder(verbose):
    screen = pygame.display.set_mode(screensize)
    game = Eventhandling()
    rubik = Dodekaeder()
-   rubik.init()
+   rubik.INIT()
    game.INIT(screen,rubik,verbose)
 
 

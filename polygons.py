@@ -967,18 +967,18 @@ def polygons():
          dka[i][0][j] = mid[i]+ 2.3*(dkz[i][0][j]-mid[i])
    return dkz, dk, mid, dka
 #
-def get_centers():
+def CENTERS():
    dkz, dk, mid, dka = polygons()
    return mid
 #
-def get_side_plgs():
+def SIDE_PLGS():
    dkz, dk, mid, dka = polygons()
    plgs =[]
    for plg in dka:
       plgs.append(plg[0])
    return plgs
 #
-def get_plgs():
+def PLGS():
    dkz, dk, mid, dka = polygons()
    sides =[]
    for i in range(0,len(dk)):

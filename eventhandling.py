@@ -5,11 +5,7 @@ import json
 import copy
 from tkinter import *
 import tkinter.filedialog
-import re
 import pygame 
-import pygame.freetype
-from pygame.locals import * 
-import sys
 import optparse
 import math as M
 import random
@@ -132,7 +128,7 @@ class Eventhandling():
       print('STRG_V ij ',ij)
       if S.V: print('STRG_V ij ',ij)
       if S.V: print('STRG_V S.strg_c', S.strg_c)
-      pg=S.rubik.get_plgs()
+      pg=S.rubik.GET_PLGS()
       if len(ij) == len(S.strg_c):
          for i in range(len(ij)):
             if S.V: print( 'ij[i], S.strg_c[i],i',ij[i], S.strg_c[i],i)
@@ -154,7 +150,7 @@ class Eventhandling():
       S.strg_c=[]
 
    def GET_PLG(S,mouse):
-      pg = S.rubik.get_plgs()
+      pg = S.rubik.GET_PLGS()
       for i in range(len(pg)):
          for j in range(len(pg[i])):
             if S.TO_PAINT(pg[i][j]) :
@@ -166,7 +162,7 @@ class Eventhandling():
       return -1, -1
 
    def GET_NEIGHB(S,i0,j0):
-      pg = S.rubik.get_plgs()
+      pg = S.rubik.GET_PLGS()
       test_plg = pg[i0][j0]
       ij=[]
       ij.append([i0,j0])
@@ -185,21 +181,21 @@ class Eventhandling():
 
    def STRG_Z(S):
       if len(S.steps):
-         angle = S.rubik.get_angle()
+         angle = S.rubik.GET_ANGLE()
          step = S.steps.pop()
          step[1] = -step[1]
          S.ROTADE_SIDE(step)
    def STRG_X(S):
       S.steps = []
-      S.rubik.reset()
+      S.rubik.RESET()
 
    def ROTADE_SIDE(S, step):
       if S.V : print ('ROTADE_SIDE')
       delta = S.delta
-      angle = S.rubik.get_angle()
+      angle = S.rubik.GET_ANGLE()
       da = angle/delta
       for i in range(delta):
-         S.rubik.rotate_side(step[0],step[1],da)
+         S.rubik.ROTATE_SIDE(step[0],step[1],da)
          S.PLOT()
 
    def MOUSE_MOVE(S, mouse, mouse_move):
@@ -262,7 +258,7 @@ class Eventhandling():
 
    def GET_SIDE(S,mouse,mouse_move):
       #print ( mouse, mouse_move)
-      centers,plgs = S.rubik.get_side_plgs()
+      centers,plgs = S.rubik.GET_SIDE_PLGS()
       i=-1
       for plg3d in plgs:
          i += 1
@@ -317,7 +313,7 @@ class Eventhandling():
 
    def PLOT(S):
       S.screen.fill((0,20,60))
-      plgs = S.rubik.get_plgs()
+      plgs = S.rubik.GET_PLGS()
       S.PLOT_PG(plgs)
       S.PLOT_STEPS()
       S.PLOT_STATUS()
@@ -446,7 +442,6 @@ class Eventhandling():
 
          elif (mouse[0] > S.size_x-S.grid_x):
             if ( mouse[1] < S.grid_y/2 ):
-               #reset
                S.STRG_X()
             else:
                S.STRG_Z()
@@ -464,11 +459,11 @@ class Eventhandling():
          else: sign = -1
          S.steps.append([i, sign])
          delta = S.delta
-         angle = S.rubik.get_angle()
+         angle = S.rubik.GET_ANGLE()
          da = angle/delta
          if i<12:
             for k in range(delta):
-               S.rubik.rotate_side(i,sign,da)
+               S.rubik.ROTATE_SIDE(i,sign,da)
                S.PLOT()
          return True
       return False
@@ -476,12 +471,11 @@ class Eventhandling():
    def PLAY_STEPS(S, x=0):
       if S.V : print ('PLAY_STEPS ',x)
       stp = int(x/S.grid_x -1)
-      angle = S.rubik.get_angle()
+      angle = S.rubik.GET_ANGLE()
       delta = S.delta
       S.delta = 12
       if (len(S.store) > stp):
          for step in  S.store[stp]:
-            #S.rubik.rotate_side(step[0],step[1],angle)
             S.ROTADE_SIDE(step)
       S.delta = delta
 
