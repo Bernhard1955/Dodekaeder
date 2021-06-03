@@ -153,8 +153,6 @@ class Eventhandling():
                   pg[S.strg_c[i][0]][S.strg_c[i][1]] = tmp
       S.strg_c=[]
 
-      
-
    def GET_PLG(S,mouse):
       pg = S.rubik.get_plgs()
       for i in range(len(pg)):
@@ -166,7 +164,7 @@ class Eventhandling():
                   if S.V : print(pg[i][j])
                   return i, j        
       return -1, -1
-   
+
    def GET_NEIGHB(S,i0,j0):
       pg = S.rubik.get_plgs()
       test_plg = pg[i0][j0]
@@ -184,7 +182,7 @@ class Eventhandling():
                         if S.V : print('dist= ', dist, 'ij ',ij)
       if S.V : print (ij)
       return ij
-   
+
    def STRG_Z(S):
       if len(S.steps):
          angle = S.rubik.get_angle()
@@ -207,7 +205,7 @@ class Eventhandling():
    def MOUSE_MOVE(S, mouse, mouse_move):
       if not S.mouse_moved and (mouse_move[0] or mouse_move[1] ):
          S.mouse_moved = True
-         
+
       if S.mouse_moved:
          if S.strg and S.mouse_pressed:
             if S.do_rot_side:
@@ -425,7 +423,7 @@ class Eventhandling():
       if S.V : print ('CONTROL ', mouse)
       if ( mouse[1] > S.grid_y and mouse[1] < S.size_y-S.grid_y):
          return False
-      if button[1] : return false
+      if button[1] : return False
 
       if ( mouse[1] < S.grid_y) :
          if ( mouse[0] < S.grid_x ):
