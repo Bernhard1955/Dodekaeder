@@ -1,6 +1,3 @@
-import sys
-import optparse
-import math as M
 import numpy as np
 
 def polygons():

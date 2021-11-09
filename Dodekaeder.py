@@ -1,25 +1,27 @@
-import pygame 
 import numpy as np
+import math as M
 from polygons import *
 import json
 
 def to_rot(plg,vec):
    center = np.zeros(3, np.float)
-   for j  in range(0,len(plg)-1):
+   for j  in range(len(plg)-1):
       center = center + plg[j] 
-   val = center[0]*vec[0]+center[1]*vec[1]+center[2]*vec[2]
+   val = center.dot(vec)
    val = val / (len(plg)-1)
    return val > 1.5
 
 def ROTATE(p,v, sig, angle):
-   pp = pygame.math.Vector3(p[0],p[1],p[2])
-   vv = pygame.math.Vector3(v[0],v[1],v[2])
-   vv.normalize()
-   pp = pp.rotate(sig*angle,vv)
-   p[0] = pp[0]
-   p[1] = pp[1]
-   p[2] = pp[2]
-   return p
+   a = 1.0/np.linalg.norm(v)*v
+   r = np.zeros((3,3))
+   an = -sig*angle/180 * M.pi
+   sn = M.sin(an)
+   cs = M.cos(an)
+   r[0][0],r[0][1],r[0][2]=a[0]*a[0]*(1-cs)+cs,a[0]*a[1]*(1-cs)-a[2]*sn,a[0]*a[2]*(1-cs)+a[1]*sn
+   r[1][0],r[1][1],r[1][2]=a[1]*a[0]*(1-cs)+a[2]*sn,a[1]*a[1]*(1-cs)+cs,a[1]*a[2]*(1-cs)-a[0]*sn
+   r[2][0],r[2][1],r[2][2]=a[2]*a[0]*(1-cs)-a[1]*sn,a[2]*a[1]*(1-cs)+a[0]*sn,a[2]*a[2]*(1-cs)+cs
+   p[0:3] = p.dot(r)
+   return 
 
 class Dodekaeder():
 
@@ -47,7 +49,7 @@ class Dodekaeder():
          for plg in plgs:
             if (to_rot(plg, vec)):
                for pt in plg:
-                  pt = ROTATE(pt,vec,sig,angle) 
+                  ROTATE(pt,vec,sig,angle) 
 
    def GET_PLGS(self):  
       return self.plgs

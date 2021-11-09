@@ -276,8 +276,7 @@ class Eventhandling():
    def TO_PAINT(S, plg):
       v1 = plg[1]-plg[0]
       v2 = plg[2]-plg[1]
-      v3 = np.zeros(3, np.float)
-      v3 = ((v1[1]*v2[2] - v1[2]*v2[1]), (v1[2]*v2[0] - v1[0]*v2[2]), (v1[0]*v2[1] - v1[1]*v2[0]))
+      v3 = [(v1[1]*v2[2] - v1[2]*v2[1]), (v1[2]*v2[0] - v1[0]*v2[2]), (v1[0]*v2[1] - v1[1]*v2[0])]
       v1 = S.mat.dot( plg[1])   
       v3 = S.mat.dot(v3)
       if v1.dot(v3) >0 :
@@ -401,9 +400,6 @@ class Eventhandling():
       xr = x -0.5*dx
       ys = S.grid_y
       r = 0.4*dy
-      #nmin= max(len(steps)-35,0)
-      #nmax= max(len(steps),0)
-      #stps = steps[nmin:nmax]
    
       if S.V: print ( 'print len(stps)', len(steps))
       if S.V: print (steps)
