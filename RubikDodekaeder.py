@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*- 
-
 # Import modules 
 import json
 import copy

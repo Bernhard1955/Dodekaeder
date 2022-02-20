@@ -404,8 +404,8 @@ class Eventhandling():
       if S.V: print ( 'print len(stps)', len(steps))
       if S.V: print (steps)
       for step in steps:
-         if step[1] == -1: x=xl
-         else: x=xr
+         if step[1] == -1: x=xr
+         else: x=xl
          ys +=dy
          center = (x, ys)
          if S.V: print( 'step= ', step, 'center= ', center)
@@ -451,8 +451,8 @@ class Eventhandling():
       else:
          x = S.size_x/2 -6*S.grid_x
          i = int((mouse[0]-x)/S.grid_x)
-         if button[0] == 0: sign =1
-         else: sign = -1
+         if button[0] == 0: sign = -1
+         else: sign = 1
          S.steps.append([i, sign])
          delta = S.delta
          angle = S.rubik.GET_ANGLE()

@@ -20,8 +20,7 @@ def ROTATE(p,v, sig, angle):
    r[0][0],r[0][1],r[0][2]=a[0]*a[0]*(1-cs)+cs,a[0]*a[1]*(1-cs)-a[2]*sn,a[0]*a[2]*(1-cs)+a[1]*sn
    r[1][0],r[1][1],r[1][2]=a[1]*a[0]*(1-cs)+a[2]*sn,a[1]*a[1]*(1-cs)+cs,a[1]*a[2]*(1-cs)-a[0]*sn
    r[2][0],r[2][1],r[2][2]=a[2]*a[0]*(1-cs)-a[1]*sn,a[2]*a[1]*(1-cs)+a[0]*sn,a[2]*a[2]*(1-cs)+cs
-   p[0:3] = p.dot(r)
-   return 
+   return p.dot(r)
 
 class Dodekaeder():
 
@@ -49,7 +48,7 @@ class Dodekaeder():
          for plg in plgs:
             if (to_rot(plg, vec)):
                for pt in plg:
-                  ROTATE(pt,vec,sig,angle) 
+                  pt[0:3] = ROTATE(pt,vec,sig,angle) 
 
    def GET_PLGS(self):  
       return self.plgs
