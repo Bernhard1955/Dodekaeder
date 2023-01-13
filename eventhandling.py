@@ -515,3 +515,6 @@ class Eventhandling():
          text = font.render('STG+x oder rotes Kreuz oben rechts Reset',1,(255,255,255))
          S.screen.blit(text, (50, line))
          line += 20
+         text = font.render('STG+.. ..=eine beliebige Ziffer n, n zufällige Zuege',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
