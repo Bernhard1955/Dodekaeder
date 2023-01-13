@@ -518,3 +518,6 @@ class Eventhandling():
          text = font.render('STG+.. ..=eine beliebige Ziffer n, n zufällige Zuege',1,(255,255,255))
          S.screen.blit(text, (50, line))
          line += 20
+         text = font.render('STG+c / STRG+v , copy paste von Teilen',1,(255,255,255))
+         S.screen.blit(text, (50, line))
+         line += 20
