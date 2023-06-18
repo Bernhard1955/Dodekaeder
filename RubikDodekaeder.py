@@ -11,7 +11,6 @@ import sys
 import optparse
 import math as M
 import random
-import numpy as np
 from eventhandling import Eventhandling
 from Dodekaeder import Dodekaeder
 
