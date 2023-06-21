@@ -4,7 +4,7 @@ from polygons import *
 import json
 
 def to_rot(plg,vec):
-   center = np.zeros(3, np.float)
+   center = np.zeros(3, np.float64)
    for j  in range(len(plg)-1):
       center = center + plg[j] 
    val = center.dot(vec)

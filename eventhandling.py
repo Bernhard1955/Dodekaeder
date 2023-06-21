@@ -56,7 +56,7 @@ class Eventhandling():
 
       S.status_line = pygame.Surface((S.size_x, S.size_y/S.grid_y))
 
-      S.mat = np.zeros((3,3), np.float)
+      S.mat = np.zeros((3,3), np. float64)
       S.mat[0][0] = S.mat[1][1] = S.mat[2][2]= 1.0
       S.scl = S.mat
       S.mat_last = S.mat
@@ -213,7 +213,7 @@ class Eventhandling():
          else:
             dx = mouse[0] -S.mid[0]
             dy = mouse[1] -S.mid[1]
-            if dx*dx + dy*dy > 200*200 and S.rot_alpha == 0:
+            if dx*dx + dy*dy > 300*300 and S.rot_alpha == 0:
                S.rot_alpha = 3
                S.ROT(mouse, mouse_move)
                S.rot_alpha = 0
@@ -236,19 +236,19 @@ class Eventhandling():
          if ( (mouse[0]-S.mid[0])*mv[1] - (mouse[1]-S.mid[1])*mv[0] ) > 0:
             delta = -delta
          S.gamma +=delta   
-      rot_x = np.zeros((3,3), np.float)
+      rot_x = np.zeros((3,3), np. float64)
       rot_x[1][1]= rot_x[2][2]=M.cos(S.beta)
       rot_x[1][2]=M.sin(S.beta)
       rot_x[2][1]= -rot_x[1][2]
       rot_x[0][0]= 1.0
 
-      rot_y = np.zeros((3,3), np.float)
+      rot_y = np.zeros((3,3), np. float64)
       rot_y[1][1]= 1.0
       rot_y[0][0]= rot_y[2][2]=M.cos(S.alpha)
       rot_y[0][2]=M.sin(S.alpha)
       rot_y[2][0]= -rot_y[0][2]
 
-      rot_z = np.zeros((3,3), np.float)
+      rot_z = np.zeros((3,3), np. float64)
       rot_z[2][2]= 1.0
       rot_z[0][0]= rot_z[1][1]=M.cos(S.gamma)
       rot_z[0][1]=M.sin(S.gamma)

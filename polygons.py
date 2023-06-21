@@ -1,8 +1,8 @@
 import numpy as np
 
 def polygons():
-   dkz = np.zeros((12,1,6,3),np.float)
-   dk = np.zeros((12,10,5,3),np.float)
+   dkz = np.zeros((12,1,6,3),np.float64)
+   dk = np.zeros((12,10,5,3),np.float64)
 # NEW_MOLECULE
 # POLYG
 # 6
@@ -952,13 +952,13 @@ def polygons():
    dk[11][9][3]=(+8.404889369382314600E-001, -1.098583259109224200E+000, -4.228835536115228000E-001)
    dk[11][9][4]=(+1.101845347459887500E+000, -9.370561142778839300E-001, +1.911645231000846900E-009)
 
-   mid = np.zeros((12,3),np.float)
+   mid = np.zeros((12,3),np.float64)
    for i in range(0,len(dkz)):
       for j in range(0,len(dkz[i][0])-1):
          mid[i]+=dkz[i][0][j]
       mid[i] *=1/(len(dkz[i][0])-1)   
 
-   dka = np.zeros((12,1,6,3),np.float)
+   dka = np.zeros((12,1,6,3),np.float64)
    for i in range(0,len(dkz)):
       for j in range(0,len(dkz[i][0])):
          dka[i][0][j] = mid[i]+ 2.3*(dkz[i][0][j]-mid[i])
