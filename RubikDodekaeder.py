@@ -14,9 +14,10 @@ import random
 import numpy as np
 from eventhandling import Eventhandling
 from Dodekaeder import Dodekaeder
+from Cube import Geometry
 
 
-def RubikDodekaeder(verbose):
+def RubikDodekaeder(verbose, cubic):
 
 
    pygame.init()
@@ -25,7 +26,11 @@ def RubikDodekaeder(verbose):
    screensize = (size_x,size_y)
    screen = pygame.display.set_mode(screensize)
    game = Eventhandling()
-   rubik = Dodekaeder()
+   if cubic:
+      rubik = Geometry()
+   else:
+      rubik = Dodekaeder()
+      
    rubik.INIT()
    game.INIT(screen,rubik,verbose)
 
@@ -119,10 +124,13 @@ if __name__ == "__main__":
    parser = optparse.OptionParser(usage="usage: %prog  ")
    parser.add_option(
       "-v", action="store_true", dest="verbose", default=False, help="verbose mode, default = False")
+   parser.add_option(
+      "-q", action="store_true", dest="cubic", default=False, help="verbose mode, default = False")
    (options, args) = parser.parse_args()
 
 
    verbose = options.verbose
+   cubic = options.cubic
    print(options, args)
    
-   RubikDodekaeder( verbose)
+   RubikDodekaeder( verbose, cubic)

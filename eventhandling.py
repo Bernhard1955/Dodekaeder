@@ -10,7 +10,6 @@ import optparse
 import math as M
 import random
 import numpy as np
-from Dodekaeder import Dodekaeder
 
 class Eventhandling():
    def INIT(S, sc, rubik,verbose):
@@ -50,7 +49,10 @@ class Eventhandling():
       S.size_y = S.screen.get_height()
       S.mid = [float(S.size_x)/2.0, float(S.size_y)/2.0 ]
       S.size = float(min(S.size_x, S.size_y))
-      S.scale = 0.15*S.size
+      centers = S.rubik.GET_CENTERS()
+      r = M.sqrt(centers[0].dot(centers[0]))
+      print ( "---RADIUS = ", r)
+      S.scale = 0.2/r*S.size
       S.grid_x =  35 #S.size_x/20
       S.grid_y =  35 #S.size_y/20
 
