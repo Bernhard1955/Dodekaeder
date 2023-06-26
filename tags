@@ -1,0 +1,60 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+CONTROL	.\eventhandling.py	/^   def CONTROL(S, mouse, button):$/;"	m	class:Eventhandling
+Dodekaeder	.\Dodekaeder.py	/^class Dodekaeder():$/;"	c
+Eventhandling	.\eventhandling.py	/^class Eventhandling():$/;"	c
+GET_NEIGHB	.\eventhandling.py	/^   def GET_NEIGHB(S,i0,j0):$/;"	m	class:Eventhandling
+GET_PLG	.\eventhandling.py	/^   def GET_PLG(S,mouse):$/;"	m	class:Eventhandling
+GET_SIDE	.\eventhandling.py	/^   def GET_SIDE(S,mouse,mouse_move):$/;"	m	class:Eventhandling
+GRID_X	.\eventhandling.py	/^   def GRID_X(S): return S.grid_x$/;"	m	class:Eventhandling
+GRID_Y	.\eventhandling.py	/^   def GRID_Y(S): return S.grid_y$/;"	m	class:Eventhandling
+HELP	.\eventhandling.py	/^   def HELP(S, val):$/;"	m	class:Eventhandling
+INIT	.\eventhandling.py	/^   def INIT(S, sc, rubik,verbose):$/;"	m	class:Eventhandling
+IN_PLG	.\eventhandling.py	/^   def IN_PLG(S,m,pg2d):$/;"	m	class:Eventhandling
+MOUSE_MOVE	.\eventhandling.py	/^   def MOUSE_MOVE(S, mouse, mouse_move):$/;"	m	class:Eventhandling
+PLAY_STEPS	.\eventhandling.py	/^   def PLAY_STEPS(S, x=0):$/;"	m	class:Eventhandling
+PLG2D	.\eventhandling.py	/^   def PLG2D(S,plg3d):$/;"	m	class:Eventhandling
+PLOT	.\eventhandling.py	/^   def PLOT(S):$/;"	m	class:Eventhandling
+PLOT_CIRCLE	.\eventhandling.py	/^   def PLOT_CIRCLE(S):$/;"	m	class:Eventhandling
+PLOT_PG	.\eventhandling.py	/^   def PLOT_PG(S, pg):$/;"	m	class:Eventhandling
+PLOT_STATUS	.\eventhandling.py	/^   def PLOT_STATUS(S):$/;"	m	class:Eventhandling
+PLOT_STEPS	.\eventhandling.py	/^   def PLOT_STEPS(S):$/;"	m	class:Eventhandling
+PLOT_TEXT	.\eventhandling.py	/^   def PLOT_TEXT(S):$/;"	m	class:Eventhandling
+PT2D	.\eventhandling.py	/^   def PT2D(S,pt3d):$/;"	m	class:Eventhandling
+RANDOM	.\eventhandling.py	/^   def RANDOM(S, n):$/;"	m	class:Eventhandling
+READ	.\eventhandling.py	/^   def READ(S):$/;"	m	class:Eventhandling
+ROT	.\eventhandling.py	/^   def ROT(S,mouse, mv):$/;"	m	class:Eventhandling
+ROTADE_SIDE	.\eventhandling.py	/^   def ROTADE_SIDE(S, step):$/;"	m	class:Eventhandling
+RubikDodekaeder	.\RubikDodekaeder.py	/^def RubikDodekaeder(verbose):$/;"	f
+SAVE	.\eventhandling.py	/^   def SAVE(S):$/;"	m	class:Eventhandling
+SET_STATUS_MP	.\eventhandling.py	/^   def SET_STATUS_MP(S,mp):$/;"	m	class:Eventhandling
+SET_STATUS_SHIFT	.\eventhandling.py	/^   def SET_STATUS_SHIFT(S,shift):$/;"	m	class:Eventhandling
+SET_STATUS_STRG	.\eventhandling.py	/^   def SET_STATUS_STRG(S,strg):$/;"	m	class:Eventhandling
+STRG_C	.\eventhandling.py	/^   def STRG_C(S,mouse):$/;"	m	class:Eventhandling
+STRG_V	.\eventhandling.py	/^   def STRG_V(S,mouse):$/;"	m	class:Eventhandling
+STRG_X	.\eventhandling.py	/^   def STRG_X(S):$/;"	m	class:Eventhandling
+STRG_Z	.\eventhandling.py	/^   def STRG_Z(S):$/;"	m	class:Eventhandling
+TO_PAINT	.\eventhandling.py	/^   def TO_PAINT(S, plg):$/;"	m	class:Eventhandling
+get_angle	.\Dodekaeder.py	/^   def get_angle(self):$/;"	m	class:Dodekaeder
+get_centers	.\Dodekaeder.py	/^   def get_centers(self):$/;"	m	class:Dodekaeder
+get_centers	.\polygons.py	/^def get_centers():$/;"	f
+get_plgs	.\Dodekaeder.py	/^   def get_plgs(self):  $/;"	m	class:Dodekaeder
+get_plgs	.\polygons.py	/^def get_plgs():$/;"	f
+get_side_plgs	.\Dodekaeder.py	/^   def get_side_plgs(self):$/;"	m	class:Dodekaeder
+get_side_plgs	.\polygons.py	/^def get_side_plgs():$/;"	f
+init	.\Dodekaeder.py	/^   def init(self):$/;"	m	class:Dodekaeder
+init_plgs	.\Dodekaeder.py	/^   def init_plgs(self,plgs):$/;"	m	class:Dodekaeder
+ortho_vec	.\vector3d.py	/^def ortho_vec(vec):$/;"	f
+ortho_vecs	.\vector3d.py	/^def ortho_vecs(vec):$/;"	f
+plot_steps	.\eventhandling.py	/^   def plot_steps(S, steps, x):$/;"	m	class:Eventhandling
+polygons	.\polygons.py	/^def polygons():$/;"	f
+reset	.\Dodekaeder.py	/^   def reset(self):$/;"	m	class:Dodekaeder
+rotate	.\Dodekaeder.py	/^def rotate(p,v, sig, angle):$/;"	f
+rotate	.\vector3d.py	/^def rotate(p, v, angle):$/;"	f
+rotate_side	.\Dodekaeder.py	/^   def rotate_side(self, side, sig,angle):$/;"	m	class:Dodekaeder
+store	.\Dodekaeder.py	/^   def store(f):$/;"	m	class:Dodekaeder
+to_rot	.\Dodekaeder.py	/^def to_rot(plg,vec):$/;"	f
