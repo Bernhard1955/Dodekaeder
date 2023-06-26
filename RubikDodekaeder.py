@@ -1,11 +1,7 @@
 # Import modules 
 import json
-import copy
-from tkinter import *
 import tkinter.filedialog
-import re
 import pygame 
-import pygame.freetype
 from pygame.locals import * 
 import sys
 import optparse
@@ -16,8 +12,7 @@ from Dodekaeder import Dodekaeder
 
 
 def RubikDodekaeder(verbose):
-
-
+   # Graphikfenster initialisieren
    pygame.init()
    size_x=1200
    size_y=800
@@ -40,7 +35,7 @@ def RubikDodekaeder(verbose):
    V = verbose
 
    while True:
-      event = pygame.event.wait()##.type == KEYDOWN or MOUSEBUTTONDOWN or QUIT
+      event = pygame.event.wait()
       if event.type == QUIT:
          pygame.quit()
          return
