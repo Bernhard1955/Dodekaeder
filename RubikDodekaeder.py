@@ -119,7 +119,7 @@ if __name__ == "__main__":
    parser.add_option(
       "-v", action="store_true", dest="verbose", default=False, help="verbose mode, default = False")
    parser.add_option(
-      "-q", action="store_true", dest="cubic", default=False, help="verbose mode, default = False")
+      "-q", action="store_true", dest="cubic", default=False, help="Play Rubik Cube, default = False")
    (options, args) = parser.parse_args()
 
 

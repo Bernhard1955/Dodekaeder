@@ -29,19 +29,28 @@ class Eventhandling():
       S.strg_c = []
 
       S.farben = []
-      S.farben.append(pygame.Color(192,0,0))
-      S.farben.append(pygame.Color(255,255,0))
-      S.farben.append(pygame.Color(0,0,127))
-      S.farben.append(pygame.Color(0,64,32))
-      S.farben.append(pygame.Color(160,0  ,160))
-      S.farben.append(pygame.Color(96,96,96))
-
-      S.farben.append(pygame.Color(64,96,255))
-      S.farben.append(pygame.Color(255,255,255))
-      S.farben.append(pygame.Color(64,255,64))
-      S.farben.append(pygame.Color(255,127,127))
-      S.farben.append(pygame.Color(0,128,0))
-      S.farben.append(pygame.Color(255,127,0))
+      S.centers = S.rubik.GET_CENTERS()
+      r = np.linalg.norm(S.centers[0])
+      if len(S.centers) == 6 :
+         S.farben.append(pygame.Color(220,220,220)) # Weiss
+         S.farben.append(pygame.Color(220,0,0)) # Rot
+         S.farben.append(pygame.Color(220,220,0)) # Gelb
+         S.farben.append(pygame.Color(220,100,0)) # Orange
+         S.farben.append(pygame.Color(0,0,220)) # Blau
+         S.farben.append(pygame.Color(0,220,0)) # Gruen
+      else:
+         S.farben.append(pygame.Color(192,0,0))
+         S.farben.append(pygame.Color(255,255,0))
+         S.farben.append(pygame.Color(0,0,127))
+         S.farben.append(pygame.Color(0,64,32))
+         S.farben.append(pygame.Color(160,0  ,160))
+         S.farben.append(pygame.Color(96,96,96))
+         S.farben.append(pygame.Color(64,96,255))
+         S.farben.append(pygame.Color(255,255,255))
+         S.farben.append(pygame.Color(64,255,64))
+         S.farben.append(pygame.Color(255,127,127))
+         S.farben.append(pygame.Color(0,128,0))
+         S.farben.append(pygame.Color(255,127,0))
 
       
       S.screen = sc
@@ -49,9 +58,6 @@ class Eventhandling():
       S.size_y = S.screen.get_height()
       S.mid = [float(S.size_x)/2.0, float(S.size_y)/2.0 ]
       S.size = float(min(S.size_x, S.size_y))
-      centers = S.rubik.GET_CENTERS()
-      r = M.sqrt(centers[0].dot(centers[0]))
-      print ( "---RADIUS = ", r)
       S.scale = 0.2/r*S.size
       S.grid_x =  35 #S.size_x/20
       S.grid_y =  35 #S.size_y/20
@@ -327,7 +333,7 @@ class Eventhandling():
       y = S.size_y - S.grid_x/2
 
       radius = S.grid_y/3
-      for i in range(0,12):
+      for i in range(0,len(S.centers)):
          center = (x,y)
          pygame.draw.circle(S.screen, S.farben[i], center, radius)
          x += S.grid_y
