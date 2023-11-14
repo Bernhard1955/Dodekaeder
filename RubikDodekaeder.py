@@ -8,8 +8,7 @@ import optparse
 import math as M
 import random
 from eventhandling import Eventhandling
-from Dodekaeder import Dodekaeder
-from Cube import Geometry
+from Geometry import Geometry
 
 
 def RubikDodekaeder(verbose, cubic):
@@ -23,9 +22,8 @@ def RubikDodekaeder(verbose, cubic):
    if cubic:
       rubik = Geometry()
    else:
-      rubik = Dodekaeder()
+      rubik = Geometry('Dodekaeder')
       
-   rubik.INIT()
    game.INIT(screen,rubik,verbose)
 
 
@@ -110,7 +108,7 @@ def RubikDodekaeder(verbose, cubic):
          game.SET_STATUS_STRG(False)
 
       if button_pressed[0] or button_pressed[1] or button_pressed[2]:
-         game.MOUSE_MOVE(mouse, mouse_move)
+         game.MOUSE_MOVE(mouse, mouse_move, button_pressed)
          game.PLOT()
 
 if __name__ == "__main__":

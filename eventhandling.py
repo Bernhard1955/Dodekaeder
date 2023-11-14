@@ -30,7 +30,6 @@ class Eventhandling():
 
       S.farben = []
       S.centers = S.rubik.GET_CENTERS()
-      r = np.linalg.norm(S.centers[0])
       if len(S.centers) == 6 :
          S.farben.append(pygame.Color(220,220,220)) # Weiss
          S.farben.append(pygame.Color(220,0,0)) # Rot
@@ -52,12 +51,12 @@ class Eventhandling():
          S.farben.append(pygame.Color(0,128,0))
          S.farben.append(pygame.Color(255,127,0))
 
-      
       S.screen = sc
       S.size_x = S.screen.get_width()
       S.size_y = S.screen.get_height()
       S.mid = [float(S.size_x)/2.0, float(S.size_y)/2.0 ]
       S.size = float(min(S.size_x, S.size_y))
+      r = np.linalg.norm(S.centers[0])
       S.scale = 0.2/r*S.size
       S.grid_x =  35 #S.size_x/20
       S.grid_y =  35 #S.size_y/20
@@ -206,10 +205,11 @@ class Eventhandling():
          S.rubik.ROTATE_SIDE(step[0],step[1],da)
          S.PLOT()
 
-   def MOUSE_MOVE(S, mouse, mouse_move):
+   def MOUSE_MOVE(S, mouse, mouse_move, button_pressed):
       if not S.mouse_moved and (mouse_move[0] or mouse_move[1] ):
          S.mouse_moved = True
 
+      # rotatate side left right if buton pressed near center
       if S.mouse_moved:
          if S.strg and S.mouse_pressed:
             if S.do_rot_side:
@@ -274,9 +274,15 @@ class Eventhandling():
             pg2d = S.PLG2D(plg3d)
             if S.IN_PLG(mouse,pg2d) : 
                center2d = S.PT2D(centers[i])
-               sign = (mouse[1]-center2d[1])*mouse_move[0] - (mouse[0]-center2d[0])*mouse_move[1]
-               if sign > 0 : sign = -1
-               elif sign < 0 : sign = 1
+               dx = mouse[0]-center2d[0]
+               dy = mouse[1]-center2d[1]
+               if (dx*dx + dy*dy) < 600 :
+                  print('im centrum')
+                  sign = -1
+               else:
+                  sign = (mouse[1]-center2d[1])*mouse_move[0] - (mouse[0]-center2d[0])*mouse_move[1]
+                  if sign > 0 : sign = -1
+                  elif sign < 0 : sign = 1
                S.steps.append([i, sign])
                return True
       return False
@@ -421,7 +427,7 @@ class Eventhandling():
 
    def CONTROL(S, mouse, button):
       if S.V : print ('CONTROL ', mouse)
-      if ( mouse[1] > S.grid_y and mouse[1] < S.size_y-S.grid_y):
+      if ( S.grid_y < mouse[1] and mouse[1] < S.size_y-S.grid_y):
          return False
       if button[1] : return False
 
@@ -459,16 +465,16 @@ class Eventhandling():
       else:
          x = S.size_x/2 -6*S.grid_x
          i = int((mouse[0]-x)/S.grid_x)
+         if i < 0 or len(S.centers) <= i : return False
          if button[0] == 0: sign = -1
          else: sign = 1
          S.steps.append([i, sign])
          delta = S.delta
          angle = S.rubik.GET_ANGLE()
          da = angle/delta
-         if i<12:
-            for k in range(delta):
-               S.rubik.ROTATE_SIDE(i,sign,da)
-               S.PLOT()
+         for k in range(delta):
+            S.rubik.ROTATE_SIDE(i,sign,da)
+            S.PLOT()
          return True
       return False
 

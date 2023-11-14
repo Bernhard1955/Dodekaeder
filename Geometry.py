@@ -1,7 +1,5 @@
 import numpy as np
 import math as M
-from polygons import *
-import json
 
 def to_rot(plg,vec):
    center = np.zeros(3, np.float64)
@@ -22,13 +20,24 @@ def ROTATE(p,v, sig, angle):
    r[2][0],r[2][1],r[2][2]=a[2]*a[0]*(1-cs)-a[1]*sn,a[2]*a[1]*(1-cs)+a[0]*sn,a[2]*a[2]*(1-cs)+cs
    return p.dot(r)
 
-class Dodekaeder():
+from polygons_cube import Cube
+from polygons import Dodekaeder
+
+class Geometry():
+
+   def __init__(self, which = 'Cube'):
+      if which == 'Cube':
+         self.Geo = Cube()
+      else: #Dodekaeder
+         self.Geo = Dodekaeder()
+      self.INIT()
 
    def INIT(self):
-      dodeka = polygons()
-      self.sides = SIDE_PLGS()
-      self.centers = CENTERS()
-      self.plgs = PLGS()
+      self.sides = self.Geo.SIDE_PLGS()
+      self.centers = self.Geo.CENTERS()
+      self.plgs = self.Geo.PLGS()
+      self.angle = self.Geo.angle
+      self.n_sides = self.Geo.n_sides
 
    def RESET(self):
       self.INIT()
@@ -40,9 +49,10 @@ class Dodekaeder():
       return self.centers
 
    def GET_ANGLE(self):
-      return 72
+      return self.angle
 
    def ROTATE_SIDE(self, side, sig,angle):
+      if side<0 and side >= self.n_sides: return
       vec = self.centers[side]
       for plgs in self.plgs:
          for plg in plgs:
