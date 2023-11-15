@@ -40,6 +40,8 @@ class Geometry():
       self.n_sides = self.Geo.n_sides
 
    def RESET(self):
+      print('RESET')
+      self.Geo.INIT()
       self.INIT()
 
    def GET_SIDE_PLGS(self):
