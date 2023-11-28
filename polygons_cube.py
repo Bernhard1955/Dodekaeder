@@ -5,6 +5,13 @@ class Cube():
       self.INIT()
       self.angle = 90.
       self.n_sides = 6
+      self.colors = [
+         (220,220,220),
+         (220,0,0),
+         (220,220,0),
+         (220,100,0),
+         (0,0,220),
+         (0,220,0)]
 
    def INIT(self):   
       self.dkz, self.dk, self.mid, self.dka = self.polygons()

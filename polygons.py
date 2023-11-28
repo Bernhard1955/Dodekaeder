@@ -6,6 +6,19 @@ class Dodekaeder():
       self.INIT()
       self.angle = 72.
       self.n_sides = 12
+      self.colors = [ 
+         (192,0,0),
+         (255,255,0),
+         (0,0,127),
+         (0,64,32),
+         (160,0  ,160),
+         (96,96,96),
+         (64,96,255),
+         (255,255,255),
+         (64,255,64),
+         (255,127,127),
+         (0,128,0),
+         (255,127,0)]
 
    def INIT(self):   
       self.dkz, self.dk, self.mid, self.dka = self.polygons()

@@ -1,40 +1,20 @@
 # Import modules 
-import json
-import tkinter.filedialog
-import pygame 
-from pygame.locals import * 
-import sys
 import optparse
-import math as M
-import random
 from eventhandling import Eventhandling
 from Geometry import Geometry
 
 
 def RubikDodekaeder(verbose, cubic):
 
-   pygame.init()
-   size_x=1200
-   size_y=800
-   screensize = (size_x,size_y)
-   screen = pygame.display.set_mode(screensize)
    if cubic:
       rubik = Geometry()
    else:
       rubik = Geometry('Dodekaeder')
       
-   EV = Eventhandling(screen,rubik,verbose)
-   EV.PLOT()
+   EV = Eventhandling(rubik,verbose)
 
-   #pygame.display.flip()
-
-   mouse_pressed = False
-   aufzeichnung =False
-   V = verbose
-
-   while True:
-      EV.WAIT()
-      return
+   EV.WAIT()
+   return
 
 if __name__ == "__main__":
 

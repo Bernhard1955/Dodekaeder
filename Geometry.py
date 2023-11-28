@@ -38,6 +38,7 @@ class Geometry():
       self.plgs = self.Geo.PLGS()
       self.angle = self.Geo.angle
       self.n_sides = self.Geo.n_sides
+      self.colors = self.Geo.colors
 
    def RESET(self):
       print('RESET')
@@ -67,3 +68,6 @@ class Geometry():
 
    def GET_PLGS(self):  
       return self.plgs
+
+   def GET_COLORS(self):  
+      return self.colors

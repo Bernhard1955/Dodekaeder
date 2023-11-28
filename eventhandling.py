@@ -12,15 +12,23 @@ import random
 import numpy as np
 import pygame 
 from pygame.locals import * 
+from pygame._sdl2 import touch
 
 class Eventhandling():
 
-   def __init__(self, sc, rubik,verbose):
+   def __init__(self, rubik,verbose):
       self.V = verbose
+      self.rubik = rubik
+
+      pygame.init()
+      size_x=1200
+      size_y=800
+      screensize = (size_x,size_y)
+      sc = pygame.display.set_mode(screensize,RESIZABLE)
+      self.screen = sc
       self.shift=False
       self.ctrl=False
       self.rot_alpha=0
-      self.rubik = rubik
       self.steps =[]
       self.text = []
       self.record = 0
@@ -30,38 +38,9 @@ class Eventhandling():
 
       self.farben = []
       self.centers = self.rubik.GET_CENTERS()
-      if len(self.centers) == 6 :
-         self.farben.append(pygame.Color(220,220,220)) # Weiss
-         self.farben.append(pygame.Color(220,0,0)) # Rot
-         self.farben.append(pygame.Color(220,220,0)) # Gelb
-         self.farben.append(pygame.Color(220,100,0)) # Orange
-         self.farben.append(pygame.Color(0,0,220)) # Blau
-         self.farben.append(pygame.Color(0,220,0)) # Gruen
-      else:
-         self.farben.append(pygame.Color(192,0,0))
-         self.farben.append(pygame.Color(255,255,0))
-         self.farben.append(pygame.Color(0,0,127))
-         self.farben.append(pygame.Color(0,64,32))
-         self.farben.append(pygame.Color(160,0  ,160))
-         self.farben.append(pygame.Color(96,96,96))
-         self.farben.append(pygame.Color(64,96,255))
-         self.farben.append(pygame.Color(255,255,255))
-         self.farben.append(pygame.Color(64,255,64))
-         self.farben.append(pygame.Color(255,127,127))
-         self.farben.append(pygame.Color(0,128,0))
-         self.farben.append(pygame.Color(255,127,0))
-
-      self.screen = sc
-      self.size_x = self.screen.get_width()
-      self.size_y = self.screen.get_height()
-      self.mid = [float(self.size_x)/2.0, float(self.size_y)/2.0 ]
-      self.size = float(min(self.size_x, self.size_y))
-      r = np.linalg.norm(self.centers[0])
-      self.scale = 0.2/r*self.size
-      self.grid_x =  35 #self.size_x/20
-      self.grid_y =  35 #self.size_y/20
-
-      self.status_line = pygame.Surface((self.size_x, self.size_y/self.grid_y))
+      self.farben = self.rubik.GET_COLORS()
+      self.T = touch.get_num_devices() > 0
+      self.RESIZE()
 
       self.mat = np.eye(3,3)
       self.mat[0][0] = self.mat[1][1] = self.mat[2][2]= 1.0
@@ -72,6 +51,43 @@ class Eventhandling():
       self.gamma = 0.0
       self.delta = 24
       self.help = False
+      print('num_devices = ',touch.get_num_devices())
+      self.PLOT()
+
+   def INIT_TOUCH(self):
+      test = True
+      self.nf = 0
+      self.delta = 7
+      sx = self.size_x
+      sy = self.size_y
+      dx = self.grid_x
+      dy = self.grid_y
+      b1 = [[sx-12*dx,1],[sx-7*dx,1+2*dy]]
+      b2 = [[sx- 7*dx,1],[sx-1*dx,1+2*dy]]
+      b3 = [[sx-12*dx,sy-2*dy+1],[sx-7*dx,sy-1]]
+      b4 = [[sx- 7*dx,sy-2*dy+1],[sx-1*dx,sy-1]]
+      b5 = [[1,sy-2*dy+1],[5*dx,sy-1]]
+      b6 = [[5*dx,sy-2*dy+1],[10*dx,sy-1]]
+      self.B = [b1,b2,b3,b4,b5,b6]
+      t1 = 'Rot_left'
+      t2 = 'Rot_right'
+      t3 = 'CTRL-C'
+      t4 = 'CTRL-V'
+      t5 = 'Store'
+      t6 = 'Open'
+      self.Text = [t1,t2,t3,t4,t5,t6]
+
+   def RESIZE(self):
+      self.size_x = self.screen.get_width()
+      self.size_y = self.screen.get_height()
+      self.mid = [float(self.size_x)/2.0, float(self.size_y)/2.0 ]
+      self.size = float(min(self.size_x, self.size_y))
+      r = np.linalg.norm(self.centers[0])
+      self.scale = 0.3/r*self.size
+      self.grid_x =  max(25,self.size_x/35) #self.size_x/20
+      self.grid_y =  max(25,self.size_x/35) #self.size_y/20
+      if self.T:
+         self.INIT_TOUCH()
 
    def WAIT(self):
       if self.V:
@@ -81,87 +97,167 @@ class Eventhandling():
          if event.type == QUIT:
             pygame.quit()
             return
-      
-         mouse = pygame.mouse.get_pos()
-         mouse_move = pygame.mouse.get_rel()
-         button_pressed = pygame.mouse.get_pressed()
-         
-         if event.type == 768: # Key pressed
-            taste = pygame.key.name(event.key)
-            if self.ctrl:
-               if taste == 'x':
-                  self.CTRL_X()
-               elif taste == 'z':
-                  self.CTRL_Z()
-               elif taste == 'c':
-                  self.CTRL_C(mouse)
-               elif taste == 'v':
-                  self.CTRL_V(mouse)
-               elif taste == 's':
-                  self.CTRL_S()
-               elif taste == 'o':
-                  self.CTRL_O()
-
-            if taste in '1234567890':
-               self.RANDOM(taste)
-            if taste =='f1':
-               self.PLOT(taste)
-               
-            if 'shift' in taste:  
-               self.shift = True
-            if 'ctrl' in taste:  
-               self.ctrl = True
-            if self.V:
-               print('taste pressed',taste, self.shift,self.ctrl)
-            continue
-         if event.type == 769: # Key releasde
-            taste = pygame.key.name(event.key)
-            if 'shift' in taste:  
-               self.shift = False
-            if 'ctrl' in taste:  
-               self.ctrl = False
-            if self.V:
-               print('taste release',taste, self.shift,self.ctrl)
-            continue
-
-         if event.type == 1025 and button_pressed[0] :
-            if self.CONTROL(mouse, button_pressed):
-               continue
-
-         if button_pressed[1] or self.shift:
-            self.ROT(mouse, mouse_move)
-            if self.V:
-               print ('Wait, ROT')
+         elif event.type == WINDOWSIZECHANGED: #resize
+            if self.V : print('Resize Screen 2')
+            self.RESIZE()
             self.PLOT()
-         elif event.type == 1025 and (button_pressed[0] or button_pressed[2]):
-            side = self.GET_SIDE(mouse)
-            if side >= 0:
-               if self.V:
-                  print ('Wait, GET_SIDE', side)
-               sign = 1
-               if button_pressed[2]: sign = -1
-               step = [side,sign]   
-               self.ROTADE_SIDE(step)
-               if len(self.steps)>0 and self.steps[-1][0] == step[0] and self.steps[-1][1] == -step[1]:
-                  self.steps.pop()
-               else:
-                  self.steps.append(step)
-               if self.V:
-                  print ('len(steps)', len(self.steps))
-               self.PLOT()
+      
+         if self.T:
+            self.TOUCH_CONTROL(event)
+            
+         else:   
+            self.MOUSE_CONTROL(event)
       return   
 
-   def GET_SIDE(self,mouse):
+   def TOUCH_CONTROL(self,event):
+      device = touch.get_device(0)
+      if event.type == FINGERDOWN:
+         nf = pygame._sdl2.touch.get_num_fingers(device)
+         if nf > 0:
+            finger = touch.get_finger(device,0)
+            print (finger)
+            mouse = [finger['x']*self.size_x, finger['y']*self.size_y]
+            cmd = self.GET_CMD(mouse)
+            self.CONTROL(mouse,[True,False,False])
+            if nf == 1:
+               if cmd == 4: self.CTRL_S()
+               if cmd == 5: self.CTRL_O()
+               
+            if nf == 2  :
+               finger2 = touch.get_finger(device,1)
+               mouse2 = [finger2['x']*self.size_x, finger2['y']*self.size_y]
+               cmd = self.GET_CMD(mouse2)
+               side = -1
+               if cmd == 0 or cmd == 1:
+                  if cmd == 0 : rot = 0
+                  if cmd == 1 : rot = 2
+                  pressed = 3*[False]
+                  pressed[rot]=True
+                  side = self.GET_SIDE(mouse,pressed)
+                  if side >= 0 : return
+               elif cmd == 2 :#ctrl_c
+                  self.CTRL_C(mouse)
+               elif cmd == 3 :#ctrl_c
+                  self.CTRL_V(mouse)
+
+               if side < 0:
+                  cmd = self.GET_CMD(mouse)
+                  if cmd == 0 or cmd == 1:
+                     if cmd == 0 : rot = 0
+                     if cmd == 1 : rot = 2
+                     pressed = 3*[False]
+                     pressed[rot]=True
+                     side = self.GET_SIDE(mouse2,pressed)
+                  elif cmd == 2 :#ctrl_c
+                     self.CTRL_C(mouse2)
+                  elif cmd == 3 :#ctrl_c
+                     self.CTRL_V(mouse2)
+      if event.type == FINGERMOTION:
+         try:
+            num_fingers = pygame._sdl2.touch.get_num_fingers(device)
+            if num_fingers == 1:
+               #finger = touch.get_finger(device,0)
+               ed = event.dict
+               mouse = [ed['x']*self.size_x, ed['y']*self.size_y]
+               if self.GET_CMD(mouse) < 0:
+                  mouse_move = [ed['dx']*self.size_x, ed['dy']*self.size_y]
+                  self.ROT(mouse, mouse_move)
+               self.PLOT()
+         except:
+            pass
+
+   def GET_CMD(self, mouse):
+      for i in range(len(self.B)):
+         b = self.B[i]
+         if b[0][0] < mouse[0] and mouse[0] < b[1][0]:
+            if b[0][1] < mouse[1] and mouse[1] < b[1][1]:
+               print('button ',i,'pressed')
+               return i
+      return -1
+
+
+   def MOUSE_CONTROL(self,event):
+      mouse = pygame.mouse.get_pos()
+      mouse_move = pygame.mouse.get_rel()
+      button_pressed = pygame.mouse.get_pressed()
+      
+      if event.type == 768: # Key pressed
+         taste = pygame.key.name(event.key)
+         if self.ctrl:
+            if taste == 'x':
+               self.CTRL_X()
+            elif taste == 'z':
+               self.CTRL_Z()
+            elif taste == 'c':
+               self.CTRL_C(mouse)
+            elif taste == 'v':
+               self.CTRL_V(mouse)
+            elif taste == 's':
+               self.CTRL_S()
+            elif taste == 'o':
+               self.CTRL_O()
+
+         if taste in '1234567890':
+            self.RANDOM(taste)
+         if taste =='f1':
+            self.PLOT(taste)
+            
+         if 'shift' in taste:  
+            self.shift = True
+         if 'ctrl' in taste:  
+            self.ctrl = True
+         if self.V:
+            print('taste pressed',taste, self.shift,self.ctrl)
+         return
+      if event.type == 769: # Key releasde
+         taste = pygame.key.name(event.key)
+         if 'shift' in taste:  
+            self.shift = False
+         if 'ctrl' in taste:  
+            self.ctrl = False
+         if self.V:
+            print('taste release',taste, self.shift,self.ctrl)
+         return
+
+      if event.type == 1025 and button_pressed[0] :
+         if self.CONTROL(mouse, button_pressed):
+            return
+
+      if button_pressed[1] or self.shift:
+         self.ROT(mouse, mouse_move)
+         if self.V:
+            print ('Wait, ROT')
+         self.PLOT()
+      elif event.type == 1025 and (button_pressed[0] or button_pressed[2]):
+         side = self.GET_SIDE(mouse,button_pressed)
+
+   def GET_SIDE(self,mouse, button_pressed):
       #print ( mouse, mouse_move)
       centers,plgs = self.rubik.GET_SIDE_PLGS()
       i=-1
+      side = -1
       for plg3d in plgs:
          i += 1
          if ( self.TO_PAINT(plg3d)):
             pg2d = self.PLG2D(plg3d)
             if self.IN_PLG(mouse,pg2d) : 
-               return i
-      return -1
+               side = i
+               break
+      if side >= 0:
+         if self.V:
+            print ('Wait, GET_SIDE', side)
+         sign = 1
+         if button_pressed[0]: sign = -1
+         step = [side,sign]   
+         self.ROTADE_SIDE(step)
+         if len(self.steps)>0 and self.steps[-1][0] == step[0] and self.steps[-1][1] == -step[1]:
+            self.steps.pop()
+         else:
+            self.steps.append(step)
+         if self.V:
+            print ('len(steps)', len(self.steps))
+         self.PLOT()
+      return side
 
    def TO_PAINT(self, plg):
       v1 = plg[1]-plg[0]
@@ -221,7 +317,25 @@ class Eventhandling():
             if self.TO_PAINT(plg3d) :
                pg2d = self.PLG2D(plg3d)   
                pygame.draw.polygon(self.screen, color, pg2d, 0)
-               pygame.draw.polygon(self.screen, schwarz, pg2d, 4)
+               pygame.draw.polygon(self.screen, (0,0,0), pg2d, 4)
+      
+      first = True
+      c = self.strg_c
+      if len(c) > 1:
+         for ij in c:
+            print( 'PLOT_PG ij', ij)
+            plg3d = pg[ij[0]][ij[1]]
+            if self.TO_PAINT(plg3d):
+               pg2d = self.PLG2D(plg3d)   
+               color = self.farben[ij[0]]
+               if first:
+                  first = False
+                  c =[0,0,0] 
+                  for i in range(3):
+                     c[i] = 0.8*(color[i] + int(0.5*(255-color[i])))
+                  color = (c[0],c[1],c[2])   
+               pygame.draw.polygon(self.screen, color, pg2d, 0)
+               pygame.draw.polygon(self.screen, (255-color[0],255-color[1],255-color[2]), pg2d, 4)
       
    def PLOT_STEPS(self):
       dx =  self.grid_x
@@ -245,8 +359,8 @@ class Eventhandling():
       if self.V: print ( 'print len(stps)', len(steps))
       if self.V: print (steps)
       for step in steps:
-         if step[1] == -1: x=xr
-         else: x=xl
+         if step[1] == -1: x=xl
+         else: x=xr
          ys +=dy
          center = (x, ys)
          if self.V: print( 'step= ', step, 'center= ', center)
@@ -262,6 +376,13 @@ class Eventhandling():
          self.PLOT()
 
    def ROT(self,mouse, mv):
+      d = (mouse[0]-self.mid[0])*(mouse[0]-self.mid[0])+(mouse[1]-self.mid[1])*(mouse[1]-self.mid[1])
+
+      if d < self.size_y*self.size_y*0.17:
+         self.rot_alpha = 0
+      else:
+         self.rot_alpha = 3
+
       if self.rot_alpha == 0 or self.rot_alpha == 1:
          self.alpha = 2.0*float(mv[0])/self.size_x*M.pi
       if self.rot_alpha == 0 or self.rot_alpha == 2:
@@ -330,6 +451,19 @@ class Eventhandling():
          pg2d = [[cx+2*r,cy],[cx-2*r,cy-r],[cx-2*r,cy+r],[cx+2*r,cy]]
          pygame.draw.polygon(self.screen, farbe, pg2d, 0)
 
+      if self.T:
+         self.PLOT_BUTTONS()
+
+   def PLOT_BUTTONS(self):
+      font = pygame.font.SysFont('arial',int(self.grid_y))
+      for i in range(len(self.B)):
+         b = self.B[i]
+         plg = [b[0], [b[1][0],b[0][1]],b[1], [b[0][0],b[1][1]],b[0]]
+         #pygame.draw.polygon(self.screen,(255,0,0),plg,0)
+         pygame.draw.polygon(self.screen,(255,255,0),plg,2)
+         text = font.render(self.Text[i],1,(255,255,0)) 
+         self.screen.blit(text, (b[0][0]+10, b[0][1]+int(self.grid_y/3)))
+
    def CONTROL(self, mouse, button):
       if self.V : print ('CONTROL ', mouse)
       if ( self.grid_y < mouse[1] and mouse[1] < self.size_y-self.grid_y):
@@ -383,6 +517,7 @@ class Eventhandling():
       ij = self.GET_NEIGHB(i0,j0)
       self.strg_c = ij
       print('STRG_C ij= ',ij)
+      self.PLOT()
 
    def CTRL_V(self,mouse):
       if self.V: print('STRG_V ', mouse)
