@@ -35,6 +35,7 @@ class Eventhandling():
       self.store = []
       self.rs = -1
       self.strg_c = []
+      self.rotkey = {}
 
       self.farben = []
       self.centers = self.rubik.GET_CENTERS()
@@ -94,6 +95,7 @@ class Eventhandling():
          print ('Wait')
       while True:
          event = pygame.event.wait()
+         #print (event)
          if event.type == QUIT:
             pygame.quit()
             return
@@ -183,6 +185,7 @@ class Eventhandling():
       
       if event.type == 768: # Key pressed
          taste = pygame.key.name(event.key)
+         sides='kiolmj'
          if self.ctrl:
             if taste == 'x':
                self.CTRL_X()
@@ -196,12 +199,27 @@ class Eventhandling():
                self.CTRL_S()
             elif taste == 'o':
                self.CTRL_O()
+            elif taste in '1234567890':
+               self.RANDOM(taste)
+         # rotate side with keyboard kiolmj
+         elif self.shift:
+            if taste in sides:
+               #side = sides.find(taste)
+               side = self.rotkey[taste]
+               print('side--- ',side, taste, self.rotkey)
+               sign = 1
+               step = [side,sign]   
+               self.ROTADE_SIDE(step, True)
+         else:
+            if taste in sides:
+               side = self.rotkey[taste]
+               print('side--- ',side, taste, self.rotkey)
+               sign = -1
+               step = [side,sign]   
+               self.ROTADE_SIDE(step, True)
+            elif taste =='f1':
+               self.PLOT(taste)
 
-         if taste in '1234567890':
-            self.RANDOM(taste)
-         if taste =='f1':
-            self.PLOT(taste)
-            
          if 'shift' in taste:  
             self.shift = True
          if 'ctrl' in taste:  
@@ -223,7 +241,7 @@ class Eventhandling():
          if self.CONTROL(mouse, button_pressed):
             return
 
-      if button_pressed[1] or self.shift:
+      if button_pressed[1] or self.ctrl:
          self.ROT(mouse, mouse_move)
          if self.V:
             print ('Wait, ROT')
@@ -249,14 +267,7 @@ class Eventhandling():
          sign = 1
          if button_pressed[0]: sign = -1
          step = [side,sign]   
-         self.ROTADE_SIDE(step)
-         if len(self.steps)>0 and self.steps[-1][0] == step[0] and self.steps[-1][1] == -step[1]:
-            self.steps.pop()
-         else:
-            self.steps.append(step)
-         if self.V:
-            print ('len(steps)', len(self.steps))
-         self.PLOT()
+         self.ROTADE_SIDE(step, True)
       return side
 
    def TO_PAINT(self, plg):
@@ -366,13 +377,21 @@ class Eventhandling():
          if self.V: print( 'step= ', step, 'center= ', center)
          pygame.draw.circle(self.screen, self.farben[step[0]], center, r)
 
-   def ROTADE_SIDE(self, step):
+   def ROTADE_SIDE(self, step, append = False):
       if self.V : print ('ROTADE_SIDE')
       delta = self.delta
       angle = self.rubik.GET_ANGLE()
       da = angle/delta
       for i in range(delta):
          self.rubik.ROTATE_SIDE(step[0],step[1],da)
+         self.PLOT()
+      if append :
+         if len(self.steps)>0 and self.steps[-1][0] == step[0] and self.steps[-1][1] == -step[1]:
+            self.steps.pop()
+         else:
+            self.steps.append(step)
+         if self.V:
+            print ('len(steps)', len(self.steps))
          self.PLOT()
 
    def ROT(self,mouse, mv):
@@ -410,6 +429,27 @@ class Eventhandling():
       rot_z[0][1]=M.sin(self.gamma)
       rot_z[1][0]= -rot_z[0][1]
       self.mat = rot_x.dot(rot_y.dot(rot_z.dot(self.mat))) 
+      # map rubik side to leter kiolmj
+      centers = self.rubik.GET_CENTERS()
+      centers = [self.mat.dot(centers[i]) for i in range(len(centers))]
+      leters = 'kiolmjswedxa-----'
+      visib = []
+      for i in range(len(centers)):
+         if centers[i][2] > 0 :
+            visib.append([centers[i][2],i])
+      visib.sort()
+      for x in visib[0:-1]:
+         x[0] = (M.atan2(centers[x[1]][1], centers[x[1]][0])+3*M.pi/5)%(2*M.pi)
+      self.rotkey = {}
+      print(visib)
+      self.rotkey[leters[0]] = visib.pop()[1]
+      visib.sort()
+      print(visib)
+      for i in range(len(visib)):
+         print(i,leters[i+1])
+         self.rotkey[leters[i+1]] = visib[i][1]
+      print (self.rotkey)
+
 
    def PLOT_STATUS(self):
       c = (self.grid_x/2, self.grid_y/2)
