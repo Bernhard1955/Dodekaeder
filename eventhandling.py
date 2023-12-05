@@ -14,10 +14,16 @@ import pygame
 from pygame.locals import * 
 from pygame._sdl2 import touch
 
+
+def PRINT(*a):
+   if DEBUG: print(*a)
+
 class Eventhandling():
 
    def __init__(self, rubik,verbose):
       self.V = verbose
+      global DEBUG
+      DEBUG = verbose
       self.rubik = rubik
 
       pygame.init()
@@ -52,7 +58,7 @@ class Eventhandling():
       self.gamma = 0.0
       self.delta = 24
       self.help = False
-      print('num_devices = ',touch.get_num_devices())
+      PRINT('num_devices = ',touch.get_num_devices())
       self.PLOT()
 
    def INIT_TOUCH(self):
@@ -69,14 +75,18 @@ class Eventhandling():
       b4 = [[sx- 7*dx,sy-2*dy+1],[sx-1*dx,sy-1]]
       b5 = [[1,sy-2*dy+1],[5*dx,sy-1]]
       b6 = [[5*dx,sy-2*dy+1],[10*dx,sy-1]]
-      self.B = [b1,b2,b3,b4,b5,b6]
+      b7 = [[sx-22*dx,sy-2*dy+1],[sx-17*dx,sy-1]]
+      b8 = [[sx-17*dx,sy-2*dy+1],[sx-12*dx,sy-1]]
+      self.B = [b1,b2,b3,b4,b5,b6,b7,b8]
       t1 = 'Rot_left'
       t2 = 'Rot_right'
       t3 = 'CTRL-C'
       t4 = 'CTRL-V'
       t5 = 'Store'
       t6 = 'Open'
-      self.Text = [t1,t2,t3,t4,t5,t6]
+      t7 = 'CTRL-Z'
+      t8 = 'Reset'
+      self.Text = [t1,t2,t3,t4,t5,t6,t7,t8]
 
    def RESIZE(self):
       self.size_x = self.screen.get_width()
@@ -91,16 +101,14 @@ class Eventhandling():
          self.INIT_TOUCH()
 
    def WAIT(self):
-      if self.V:
-         print ('Wait')
+      PRINT ('Wait')
       while True:
          event = pygame.event.wait()
-         #print (event)
          if event.type == QUIT:
             pygame.quit()
             return
          elif event.type == WINDOWSIZECHANGED: #resize
-            if self.V : print('Resize Screen 2')
+            PRINT('Resize Screen 2')
             self.RESIZE()
             self.PLOT()
       
@@ -117,13 +125,15 @@ class Eventhandling():
          nf = pygame._sdl2.touch.get_num_fingers(device)
          if nf > 0:
             finger = touch.get_finger(device,0)
-            print (finger)
+            PRINT (finger)
             mouse = [finger['x']*self.size_x, finger['y']*self.size_y]
             cmd = self.GET_CMD(mouse)
-            self.CONTROL(mouse,[True,False,False])
+            if cmd == -1 : self.CONTROL(mouse,[True,False,False])
             if nf == 1:
                if cmd == 4: self.CTRL_S()
                if cmd == 5: self.CTRL_O()
+               if cmd == 6: self.CTRL_Z()
+               if cmd == 7: self.CTRL_X()
                
             if nf == 2  :
                finger2 = touch.get_finger(device,1)
@@ -173,7 +183,7 @@ class Eventhandling():
          b = self.B[i]
          if b[0][0] < mouse[0] and mouse[0] < b[1][0]:
             if b[0][1] < mouse[1] and mouse[1] < b[1][1]:
-               print('button ',i,'pressed')
+               PRINT('button ',i,'pressed')
                return i
       return -1
 
@@ -199,8 +209,8 @@ class Eventhandling():
                self.CTRL_S()
             elif taste == 'o':
                self.CTRL_O()
-            elif taste in '1234567890':
-               self.RANDOM(taste)
+         if taste in '1234567890':
+            self.RANDOM(taste)
          # rotate side with keyboard kiolmj
          elif self.shift:
             if taste in sides:
@@ -219,13 +229,12 @@ class Eventhandling():
                self.ROTADE_SIDE(step, True)
             elif taste =='f1':
                self.PLOT(taste)
-
+            
          if 'shift' in taste:  
             self.shift = True
          if 'ctrl' in taste:  
             self.ctrl = True
-         if self.V:
-            print('taste pressed',taste, self.shift,self.ctrl)
+         PRINT('taste pressed',taste, self.shift,self.ctrl)
          return
       if event.type == 769: # Key releasde
          taste = pygame.key.name(event.key)
@@ -233,24 +242,22 @@ class Eventhandling():
             self.shift = False
          if 'ctrl' in taste:  
             self.ctrl = False
-         if self.V:
-            print('taste release',taste, self.shift,self.ctrl)
+         PRINT('taste release',taste, self.shift,self.ctrl)
          return
 
       if event.type == 1025 and button_pressed[0] :
          if self.CONTROL(mouse, button_pressed):
             return
 
-      if button_pressed[1] or self.ctrl:
+      if button_pressed[1] or self.shift:
          self.ROT(mouse, mouse_move)
-         if self.V:
-            print ('Wait, ROT')
+         PRINT ('Wait, ROT')
          self.PLOT()
       elif event.type == 1025 and (button_pressed[0] or button_pressed[2]):
          side = self.GET_SIDE(mouse,button_pressed)
 
    def GET_SIDE(self,mouse, button_pressed):
-      #print ( mouse, mouse_move)
+      #PRINT ( mouse, mouse_move)
       centers,plgs = self.rubik.GET_SIDE_PLGS()
       i=-1
       side = -1
@@ -262,12 +269,17 @@ class Eventhandling():
                side = i
                break
       if side >= 0:
-         if self.V:
-            print ('Wait, GET_SIDE', side)
+         PRINT ('Wait, GET_SIDE', side)
          sign = 1
          if button_pressed[0]: sign = -1
          step = [side,sign]   
-         self.ROTADE_SIDE(step, True)
+         self.ROTADE_SIDE(step)
+         if len(self.steps)>0 and self.steps[-1][0] == step[0] and self.steps[-1][1] == -step[1]:
+            self.steps.pop()
+         else:
+            self.steps.append(step)
+         PRINT ('len(steps)', len(self.steps))
+         self.PLOT()
       return side
 
    def TO_PAINT(self, plg):
@@ -277,10 +289,10 @@ class Eventhandling():
       v1 = self.mat.dot( plg[1])   
       v3 = self.mat.dot(v3)
       if v1.dot(v3) >0 :
-         # print ('+')
+         # PRINT ('+')
          return v3[2] >0
       else:
-         # print ('-')
+         # PRINT ('-')
          return v3[2] <0
 
    def PLG2D(self,plg3d):
@@ -334,7 +346,7 @@ class Eventhandling():
       c = self.strg_c
       if len(c) > 1:
          for ij in c:
-            print( 'PLOT_PG ij', ij)
+            PRINT( 'PLOT_PG ij', ij)
             plg3d = pg[ij[0]][ij[1]]
             if self.TO_PAINT(plg3d):
                pg2d = self.PLG2D(plg3d)   
@@ -354,7 +366,7 @@ class Eventhandling():
       self.plot_steps(self.steps, self.size_x)
       if self.record : self.plot_steps(self.steps[self.rs:], dx)
       if len(self.store) > 0 :
-         if self.V: print ( 'print len(self.store)', len(self.store[0]))
+         PRINT ( 'print len(self.store)', len(self.store[0]))
       for  steps in self.store:
          self.plot_steps(steps, x)
          x += dx
@@ -367,18 +379,18 @@ class Eventhandling():
       ys = self.grid_y
       r = 0.4*dy
    
-      if self.V: print ( 'print len(stps)', len(steps))
-      if self.V: print (steps)
+      PRINT ( 'print len(stps)', len(steps))
+      PRINT (steps)
       for step in steps:
          if step[1] == -1: x=xl
          else: x=xr
          ys +=dy
          center = (x, ys)
-         if self.V: print( 'step= ', step, 'center= ', center)
+         PRINT( 'step= ', step, 'center= ', center)
          pygame.draw.circle(self.screen, self.farben[step[0]], center, r)
 
-   def ROTADE_SIDE(self, step, append = False):
-      if self.V : print ('ROTADE_SIDE')
+   def ROTADE_SIDE(self, step, append=False):
+      PRINT ('ROTADE_SIDE')
       delta = self.delta
       angle = self.rubik.GET_ANGLE()
       da = angle/delta
@@ -401,6 +413,7 @@ class Eventhandling():
          self.rot_alpha = 0
       else:
          self.rot_alpha = 3
+      PRINT('self.rot_alpha', self.rot_alpha)
 
       if self.rot_alpha == 0 or self.rot_alpha == 1:
          self.alpha = 2.0*float(mv[0])/self.size_x*M.pi
@@ -412,22 +425,25 @@ class Eventhandling():
             delta = -delta
          self.gamma =delta   
       rot_x = np.eye(3,3)
-      rot_x[1][1]= rot_x[2][2]=M.cos(self.beta)
-      rot_x[1][2]=M.sin(self.beta)
-      rot_x[2][1]= -rot_x[1][2]
-      rot_x[0][0]= 1.0
+      if self.rot_alpha == 0 or self.rot_alpha == 1:
+         rot_x[1][1]= rot_x[2][2]=M.cos(self.beta)
+         rot_x[1][2]=M.sin(self.beta)
+         rot_x[2][1]= -rot_x[1][2]
+         rot_x[0][0]= 1.0
 
       rot_y = np.eye(3,3)
-      rot_y[1][1]= 1.0
-      rot_y[0][0]= rot_y[2][2]=M.cos(self.alpha)
-      rot_y[0][2]=M.sin(self.alpha)
-      rot_y[2][0]= -rot_y[0][2]
+      if self.rot_alpha == 0 or self.rot_alpha == 2:
+         rot_y[1][1]= 1.0
+         rot_y[0][0]= rot_y[2][2]=M.cos(self.alpha)
+         rot_y[0][2]=M.sin(self.alpha)
+         rot_y[2][0]= -rot_y[0][2]
 
       rot_z = np.eye(3,3)
-      rot_z[2][2]= 1.0
-      rot_z[0][0]= rot_z[1][1]=M.cos(self.gamma)
-      rot_z[0][1]=M.sin(self.gamma)
-      rot_z[1][0]= -rot_z[0][1]
+      if self.rot_alpha == 3:
+         rot_z[2][2]= 1.0
+         rot_z[0][0]= rot_z[1][1]=M.cos(self.gamma)
+         rot_z[0][1]=M.sin(self.gamma)
+         rot_z[1][0]= -rot_z[0][1]
       self.mat = rot_x.dot(rot_y.dot(rot_z.dot(self.mat))) 
       # map rubik side to leter kiolmj
       centers = self.rubik.GET_CENTERS()
@@ -439,7 +455,7 @@ class Eventhandling():
             visib.append([centers[i][2],i])
       visib.sort()
       for x in visib[0:-1]:
-         x[0] = (M.atan2(centers[x[1]][1], centers[x[1]][0])+3*M.pi/5)%(2*M.pi)
+         x[0] = (M.atan2(centers[x[1]][1], centers[x[1]][0])+7*M.pi/10)%(2*M.pi)
       self.rotkey = {}
       print(visib)
       self.rotkey[leters[0]] = visib.pop()[1]
@@ -505,7 +521,7 @@ class Eventhandling():
          self.screen.blit(text, (b[0][0]+10, b[0][1]+int(self.grid_y/3)))
 
    def CONTROL(self, mouse, button):
-      if self.V : print ('CONTROL ', mouse)
+      PRINT ('CONTROL ', mouse)
       if ( self.grid_y < mouse[1] and mouse[1] < self.size_y-self.grid_y):
          return False
       if button[1] : return False
@@ -514,11 +530,11 @@ class Eventhandling():
          if ( mouse[0] < self.grid_x ):
             if not self.record: # 
                self.record = True # start recoder 
-               if self.V : print ('start Record')
+               PRINT ('start Record')
                self.rs = len(self.steps)
             else:
                self.record = False # end record
-               if self.V : print ('end Record')
+               PRINT ('end Record')
                if ( self.steps[self.rs:]):
                   self.store.append(self.steps[self.rs:])
                   steps = copy.deepcopy(self.steps[self.rs:])
@@ -535,7 +551,7 @@ class Eventhandling():
             if button[0]:
                self.PLAY_STEPS(mouse[0])
             else:
-               if self.V : print ('color edit')
+               PRINT ('color edit')
          self.PLOT()
          return True
 
@@ -553,22 +569,22 @@ class Eventhandling():
    def CTRL_C(self,mouse):
       i0,j0 = self.GET_PLG(mouse)
       self.strg_c = []
-      if self.V : print('i0= ',i0,', j0= ',j0)
+      PRINT('i0= ',i0,', j0= ',j0)
       ij = self.GET_NEIGHB(i0,j0)
       self.strg_c = ij
-      print('STRG_C ij= ',ij)
+      PRINT('STRG_C ij= ',ij)
       self.PLOT()
 
    def CTRL_V(self,mouse):
-      if self.V: print('STRG_V ', mouse)
+      PRINT('STRG_V ', mouse)
       i0,j0 = self.GET_PLG(mouse)
       ij = self.GET_NEIGHB(i0,j0)
-      if self.V: print('STRG_V ij ',ij)
-      if self.V: print('STRG_V self.strg_c', self.strg_c)
+      PRINT('STRG_V ij ',ij)
+      PRINT('STRG_V self.strg_c', self.strg_c)
       pg=self.rubik.GET_PLGS()
       if len(ij) == len(self.strg_c):
          for i in range(len(ij)):
-            if self.V: print( 'ij[i], self.strg_c[i],i',ij[i], self.strg_c[i],i)
+            PRINT( 'ij[i], self.strg_c[i],i',ij[i], self.strg_c[i],i)
             if len(ij) == 2 or i == 0:
                tmp = pg[ij[i][0]][ij[i][1]]
                pg[ij[i][0]][ij[i][1]] = pg[self.strg_c[i][0]][self.strg_c[i][1]]
@@ -594,8 +610,8 @@ class Eventhandling():
             if self.TO_PAINT(pg[i][j]) :
                pg2d = self.PLG2D(pg[i][j])   
                if self.IN_PLG(mouse, pg2d) :
-                  if self.V : print('i= ',i,', j= ',j)
-                  if self.V : print(pg[i][j])
+                  PRINT('i= ',i,', j= ',j)
+                  PRINT(pg[i][j])
                   return i, j        
       return -1, -1
 
@@ -613,12 +629,12 @@ class Eventhandling():
                      dist = np.inner(diff,diff)
                      if dist < 0.01 and j0%2 == j%2 and (i0 != i or j0 != j):
                         ij.append([i,j,k,l])
-                        if self.V : print('dist= ', dist, 'ij ',ij)
-      if self.V : print (ij)
+                        PRINT('dist= ', dist, 'ij ',ij)
+      PRINT (ij)
       return ij
 
    def PLAY_STEPS(self, x=0):
-      if self.V : print ('PLAY_STEPS ',x)
+      PRINT ('PLAY_STEPS ',x)
       stp = int(x/self.grid_x -1)
       angle = self.rubik.GET_ANGLE()
       if (len(self.store) > stp):
@@ -632,7 +648,7 @@ class Eventhandling():
          with open(file_path_string, 'w') as f :
             json.dump([self.steps, self.store], f)
       except :
-         if self.V : print ('File open failed')
+         PRINT ('File open failed')
 
    def CTRL_O(self):
       Tk().withdraw()
@@ -641,8 +657,8 @@ class Eventhandling():
          with open(file_path_string, 'r') as f :
             self.steps, self.store = json.load(f)
       except :
-         if self.V : print ('File open failed')
-      print (self.store)
+         PRINT ('File open failed')
+      PRINT (self.store)
       self.PLOT()   
 
    def RANDOM(self, n):
@@ -654,7 +670,7 @@ class Eventhandling():
       return False
 
    def HELP(self):
-      print('HELP')
+      PRINT('HELP')
       line = 500
       font = pygame.font.SysFont('arial',18)
       text = font.render('Dodekaeder Hilfe (F1)',1,(255,255,255))
