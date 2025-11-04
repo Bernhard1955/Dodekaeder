@@ -77,7 +77,9 @@ class Eventhandling():
       b6 = [[5*dx,sy-2*dy+1],[10*dx,sy-1]]
       b7 = [[sx-22*dx,sy-2*dy+1],[sx-17*dx,sy-1]]
       b8 = [[sx-17*dx,sy-2*dy+1],[sx-12*dx,sy-1]]
-      self.B = [b1,b2,b3,b4,b5,b6,b7,b8]
+      b9 = [[sx- 7*dx,1+2*dy],[sx-1*dx,1+4*dy]]
+      b9 = [[1,sy-4*dy+1],[5*dx,sy-2*dy+1]]
+      self.B = [b1,b2,b3,b4,b5,b6,b7,b8,b9]
       t1 = 'Rot_left'
       t2 = 'Rot_right'
       t3 = 'CTRL-C'
@@ -86,7 +88,8 @@ class Eventhandling():
       t6 = 'Open'
       t7 = 'CTRL-Z'
       t8 = 'Reset'
-      self.Text = [t1,t2,t3,t4,t5,t6,t7,t8]
+      t9 = 'Rotate'
+      self.Text = [t1,t2,t3,t4,t5,t6,t7,t8,t9]
 
    def RESIZE(self):
       self.size_x = self.screen.get_width()
@@ -121,8 +124,26 @@ class Eventhandling():
 
    def TOUCH_CONTROL(self,event):
       device = touch.get_device(0)
-      if event.type == FINGERDOWN:
+      try: 
          nf = pygame._sdl2.touch.get_num_fingers(device)
+      except:
+         nf = 0
+      if event.type == FINGERMOTION:
+         if nf == 2:
+            try:
+               num_fingers = nf
+               if num_fingers == 2:
+                  #finger = touch.get_finger(device,0)
+                  ed = event.dict
+                  mouse = [ed['x']*self.size_x, ed['y']*self.size_y]
+                  if self.GET_CMD(mouse) < 0:
+                     mouse_move = [ed['dx']*self.size_x, ed['dy']*self.size_y]
+                     self.ROT(mouse, mouse_move)
+                  self.PLOT()
+            except:
+               pass
+
+      if event.type == FINGERDOWN:
          if nf > 0:
             finger = touch.get_finger(device,0)
             PRINT (finger)
@@ -164,19 +185,6 @@ class Eventhandling():
                      self.CTRL_C(mouse2)
                   elif cmd == 3 :#ctrl_c
                      self.CTRL_V(mouse2)
-      if event.type == FINGERMOTION:
-         try:
-            num_fingers = pygame._sdl2.touch.get_num_fingers(device)
-            if num_fingers == 1:
-               #finger = touch.get_finger(device,0)
-               ed = event.dict
-               mouse = [ed['x']*self.size_x, ed['y']*self.size_y]
-               if self.GET_CMD(mouse) < 0:
-                  mouse_move = [ed['dx']*self.size_x, ed['dy']*self.size_y]
-                  self.ROT(mouse, mouse_move)
-               self.PLOT()
-         except:
-            pass
 
    def GET_CMD(self, mouse):
       for i in range(len(self.B)):
