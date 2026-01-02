@@ -5,7 +5,6 @@ import json
 import copy
 from tkinter import *
 import tkinter.filedialog
-import pygame 
 import optparse
 import math as M
 import random
@@ -42,6 +41,11 @@ class Eventhandling():
       self.rs = -1
       self.strg_c = []
       self.rotkey = {}
+
+      self.side = -1
+      self.center = None
+      self.mouse = [0,0]
+      self.sign = 0
 
       self.farben = []
       self.centers = self.rubik.GET_CENTERS()
@@ -166,7 +170,7 @@ class Eventhandling():
                   if cmd == 1 : rot = 2
                   pressed = 3*[False]
                   pressed[rot]=True
-                  side = self.GET_SIDE(mouse,pressed)
+                  side, center = self.GET_SIDE(mouse,pressed)
                   if side >= 0 : return
                elif cmd == 2 :#ctrl_c
                   self.CTRL_C(mouse)
@@ -180,7 +184,7 @@ class Eventhandling():
                      if cmd == 1 : rot = 2
                      pressed = 3*[False]
                      pressed[rot]=True
-                     side = self.GET_SIDE(mouse2,pressed)
+                     side, center = self.GET_SIDE(mouse2,pressed)
                   elif cmd == 2 :#ctrl_c
                      self.CTRL_C(mouse2)
                   elif cmd == 3 :#ctrl_c
@@ -201,7 +205,7 @@ class Eventhandling():
       mouse_move = pygame.mouse.get_rel()
       button_pressed = pygame.mouse.get_pressed()
       
-      if event.type == 768: # Key pressed
+      if event.type == KEYDOWN: # Key pressed
          taste = pygame.key.name(event.key)
          sides='kiolmj'
          if self.ctrl:
@@ -229,7 +233,7 @@ class Eventhandling():
                step = [side,sign]   
                self.ROTADE_SIDE(step, True)
          else:
-            if taste in sides:
+            if taste in sides and taste in self.rotkey.keys() :
                side = self.rotkey[taste]
                PRINT('side--- ',side, taste, self.rotkey)
                sign = -1
@@ -244,7 +248,7 @@ class Eventhandling():
             self.ctrl = True
          PRINT('taste pressed',taste, self.shift,self.ctrl)
          return
-      if event.type == 769: # Key releasde
+      if event.type == KEYUP: # Key releasde
          taste = pygame.key.name(event.key)
          if 'shift' in taste:  
             self.shift = False
@@ -252,23 +256,51 @@ class Eventhandling():
             self.ctrl = False
          PRINT('taste release',taste, self.shift,self.ctrl)
          return
-
+      
       if event.type == 1025 and button_pressed[0] :
          if self.CONTROL(mouse, button_pressed):
             return
-
-      if button_pressed[1] or self.shift:
-         self.ROT(mouse, mouse_move)
-         PRINT ('Wait, ROT')
-         self.PLOT()
-      elif event.type == 1025 and (button_pressed[0] or button_pressed[2]):
-         side = self.GET_SIDE(mouse,button_pressed)
+      
+      if self.shift:
+         if button_pressed[1]:
+            self.ROT(mouse, mouse_move)
+            PRINT ('Wait, ROT')
+            self.PLOT()
+      elif event.type == MOUSEBUTTONDOWN and button_pressed[1]:
+         side, center = self.GET_SIDE(mouse,button_pressed)
+         if side > -1 : 
+            center2d = self.PLG2D([center])
+            print('center=', center, center2d[0], mouse)
+            self.side = side
+            self.center = center2d[0] 
+            self.mouse = [mouse[0], mouse[1]]
+      elif event.type == MOUSEMOTION and button_pressed[1]:
+         self.sign = 1
+         v0 = [self.mouse[0]-self.center[0], self.mouse[1]-self.center[1]]
+         v1 = [mouse[0]-self.center[0], mouse[1]-self.center[1]]
+         cross = v0[0]*v1[1] - v0[1]*v1[0]
+         if cross < 0 : self.sign = -1
+         print('cross=', cross, self.sign, v0, v1)
+      elif event.type == MOUSEBUTTONUP and button_pressed[1]==False and self.side >=0:
+         if self.side > -1 and self.sign != 0:
+            step = [self.side,self.sign]
+            self.ROTADE_SIDE(step)
+            if len(self.steps)>0 and self.steps[-1][0] == step[0] and self.steps[-1][1] == -step[1]:
+               self.steps.pop()
+            else:
+               self.steps.append(step)
+            self.side = -1
+            self.sign = 0# reset side
+            self.PLOT()
+      elif event.type == MOUSEBUTTONDOWN and (button_pressed[0] or button_pressed[2]):
+         side, center = self.GET_SIDE(mouse,button_pressed)
 
    def GET_SIDE(self,mouse, button_pressed):
       #PRINT ( mouse, mouse_move)
       centers,plgs = self.rubik.GET_SIDE_PLGS()
       i=-1
       side = -1
+      center = None
       for plg3d in plgs:
          i += 1
          if ( self.TO_PAINT(plg3d)):
@@ -278,6 +310,9 @@ class Eventhandling():
                break
       if side >= 0:
          PRINT ('Wait, GET_SIDE', side)
+         center = centers[side]
+         if button_pressed[1]:
+            return side, center
          sign = 1
          if button_pressed[0]: sign = -1
          step = [side,sign]   
@@ -288,7 +323,7 @@ class Eventhandling():
             self.steps.append(step)
          PRINT ('len(steps)', len(self.steps))
          self.PLOT()
-      return side
+      return side, center
 
    def TO_PAINT(self, plg):
       v1 = plg[1]-plg[0]
