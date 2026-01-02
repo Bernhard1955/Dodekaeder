@@ -274,7 +274,7 @@ class Eventhandling():
             self.side = side
             self.center = center2d[0] 
             self.mouse = [mouse[0], mouse[1]]
-      elif event.type == MOUSEMOTION and button_pressed[1]:
+      elif event.type == MOUSEMOTION and button_pressed[1] and self.side >=0:
          self.sign = 1
          v0 = [self.mouse[0]-self.center[0], self.mouse[1]-self.center[1]]
          v1 = [mouse[0]-self.center[0], mouse[1]-self.center[1]]
