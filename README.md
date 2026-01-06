@@ -1,5 +1,5 @@
 # Dodekaeder
-RubiksDodekaeder with Python
+Play RubiksDodekaeder with Python script
 
 Virtual Rubik Dodecahedron 
 https://de.wikipedia.org/wiki/Megaminx#/media/Datei:Megaminx6.jpg
