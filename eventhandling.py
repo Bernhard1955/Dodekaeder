@@ -66,6 +66,7 @@ class Eventhandling():
       self.PLOT()
 
    def INIT_TOUCH(self):
+      self.device = touch.get_device(0)
       test = True
       self.nf = 0
       self.delta = 7
@@ -102,8 +103,8 @@ class Eventhandling():
       self.size = float(min(self.size_x, self.size_y))
       r = np.linalg.norm(self.centers[0])
       self.scale = 0.3/r*self.size
-      self.grid_x =  max(25,self.size_x/35) #self.size_x/20
-      self.grid_y =  max(25,self.size_x/35) #self.size_y/20
+      self.grid_x =  max(25,self.size_x/55) #self.size_x/20
+      self.grid_y =  max(25,self.size_x/55) #self.size_y/20
       if self.T:
          self.INIT_TOUCH()
 
@@ -127,9 +128,8 @@ class Eventhandling():
       return   
 
    def TOUCH_CONTROL(self,event):
-      device = touch.get_device(0)
       try: 
-         nf = pygame._sdl2.touch.get_num_fingers(device)
+         nf = pygame._sdl2.touch.get_num_fingers(self.device)
       except:
          nf = 0
       if event.type == FINGERMOTION:
@@ -138,14 +138,13 @@ class Eventhandling():
                #finger = touch.get_finger(device,0)
                ed = event.dict
                mouse = [ed['x']*self.size_x, ed['y']*self.size_y]
-               if self.GET_CMD(mouse) < 0:
-                  mouse_move = [ed['dx']*self.size_x, ed['dy']*self.size_y]
-                  self.ROT(mouse, mouse_move)
+               mouse_move = [ed['dx']*self.size_x, ed['dy']*self.size_y]
+               self.ROT(mouse, mouse_move)
                self.PLOT()
             except:
                pass
          elif nf == 1 and self.side >=0 :
-            finger = touch.get_finger(device,0)
+            finger = touch.get_finger(self.device,0)
             mouse = [finger['x']*self.size_x, finger['y']*self.size_y]
             self.sign = 1
             v0 = [self.mouse[0]-self.center[0], self.mouse[1]-self.center[1]]
@@ -165,44 +164,16 @@ class Eventhandling():
             self.side = -1
             self.sign = 0# reset side
             self.PLOT()
-      """
-      elif event.type == MOUSEBUTTONDOWN and button_pressed[1]:
-         side, center = self.GET_SIDE(mouse,button_pressed)
-         if side > -1 : 
-            center2d = self.PLG2D([center])
-            print('center=', center, center2d[0], mouse)
-            self.side = side
-            self.center = center2d[0] 
-            self.mouse = [mouse[0], mouse[1]]
-      elif event.type == MOUSEMOTION and button_pressed[1] and self.side >=0:
-         self.sign = 1
-         v0 = [self.mouse[0]-self.center[0], self.mouse[1]-self.center[1]]
-         v1 = [mouse[0]-self.center[0], mouse[1]-self.center[1]]
-         cross = v0[0]*v1[1] - v0[1]*v1[0]
-         if cross < 0 : self.sign = -1
-         print('cross=', cross, self.sign, v0, v1)
-      elif event.type == MOUSEBUTTONUP and button_pressed[1]==False and self.side >=0:
-         if self.side > -1 and self.sign != 0:
-            step = [self.side,self.sign]
-            self.ROTADE_SIDE(step)
-            if len(self.steps)>0 and self.steps[-1][0] == step[0] and self.steps[-1][1] == -step[1]:
-               self.steps.pop()
-            else:
-               self.steps.append(step)
-            self.side = -1
-            self.sign = 0# reset side
-            self.PLOT()
-      """
 
       if event.type == FINGERDOWN:
          if nf > 0:
-            finger = touch.get_finger(device,0)
-            PRINT (finger)
+            finger = touch.get_finger(self.device,0)
+            PRINT ('finger', finger)
             mouse = [finger['x']*self.size_x, finger['y']*self.size_y]
+         if nf == 1:
             side = -1
-            if nf == 1 :
-               button_pressed = [False,True,False]
-               side, center = self.GET_SIDE(mouse,button_pressed)
+            button_pressed = [False,True,False]
+            side, center = self.GET_SIDE(mouse,button_pressed)
             if side > -1 : 
                PRINT ('side, center', side, center)
                center2d = self.PLG2D([center])
@@ -219,35 +190,36 @@ class Eventhandling():
                   if cmd == 6: self.CTRL_Z()
                   if cmd == 7: self.CTRL_X()
                
-            if nf == 2  :
-               finger2 = touch.get_finger(device,1)
-               mouse2 = [finger2['x']*self.size_x, finger2['y']*self.size_y]
-               cmd = self.GET_CMD(mouse2)
-               side = -1
+         elif nf == 2 :
+            self.side = -1
+            finger2 = touch.get_finger(self.device,1)
+            mouse2 = [finger2['x']*self.size_x, finger2['y']*self.size_y]
+            cmd = self.GET_CMD(mouse2)
+            side = -1
+            if cmd == 0 or cmd == 1:
+               if cmd == 0 : rot = 0
+               if cmd == 1 : rot = 2
+               pressed = 3*[False]
+               pressed[rot]=True
+               side, center = self.GET_SIDE(mouse,pressed)
+               if side >= 0 : return
+            elif cmd == 2 :#ctrl_c
+               self.CTRL_C(mouse)
+            elif cmd == 3 :#ctrl_c
+               self.CTRL_V(mouse)
+
+            if side < 0:
+               cmd = self.GET_CMD(mouse)
                if cmd == 0 or cmd == 1:
                   if cmd == 0 : rot = 0
                   if cmd == 1 : rot = 2
                   pressed = 3*[False]
                   pressed[rot]=True
-                  side, center = self.GET_SIDE(mouse,pressed)
-                  if side >= 0 : return
+                  side, center = self.GET_SIDE(mouse2,pressed)
                elif cmd == 2 :#ctrl_c
-                  self.CTRL_C(mouse)
+                  self.CTRL_C(mouse2)
                elif cmd == 3 :#ctrl_c
-                  self.CTRL_V(mouse)
-
-               if side < 0:
-                  cmd = self.GET_CMD(mouse)
-                  if cmd == 0 or cmd == 1:
-                     if cmd == 0 : rot = 0
-                     if cmd == 1 : rot = 2
-                     pressed = 3*[False]
-                     pressed[rot]=True
-                     side, center = self.GET_SIDE(mouse2,pressed)
-                  elif cmd == 2 :#ctrl_c
-                     self.CTRL_C(mouse2)
-                  elif cmd == 3 :#ctrl_c
-                     self.CTRL_V(mouse2)
+                  self.CTRL_V(mouse2)
 
    def GET_CMD(self, mouse):
       for i in range(len(self.B)):
@@ -518,11 +490,11 @@ class Eventhandling():
       PRINT('self.rot_alpha', self.rot_alpha)
 
       if self.rot_alpha == 0 or self.rot_alpha == 1:
-         self.alpha = 2.0*float(mv[0])/self.size_x*M.pi
+         self.alpha = float(mv[0])/450*M.pi
       if self.rot_alpha == 0 or self.rot_alpha == 2:
-         self.beta  = 2.0*float(mv[1])/self.size_y*M.pi
+         self.beta  = float(mv[1])/300*M.pi
       if self.rot_alpha == 3 :
-         delta  = 2.0*M.sqrt(float(mv[1]*mv[1]+mv[0]*mv[0]))/self.size_y*M.pi
+         delta  = M.sqrt(float(mv[1]*mv[1]+mv[0]*mv[0]))/400*M.pi
          if ( (mouse[0]-self.mid[0])*mv[1] - (mouse[1]-self.mid[1])*mv[0] ) > 0:
             delta = -delta
          self.gamma =delta   
@@ -753,7 +725,7 @@ class Eventhandling():
             self.ROTADE_SIDE(step)
 
    def CTRL_S(self):
-      Tk().withdraw()
+      #Tk().withdraw()
       file_path_string = tkinter.filedialog.asksaveasfilename()
       try:
          with open(file_path_string, 'w') as f :
@@ -762,7 +734,7 @@ class Eventhandling():
          PRINT ('File open failed')
 
    def CTRL_O(self):
-      Tk().withdraw()
+      #Tk().withdraw()
       file_path_string = tkinter.filedialog.askopenfilename()
       try:
          with open(file_path_string, 'r') as f :
@@ -770,6 +742,8 @@ class Eventhandling():
       except :
          PRINT ('File open failed')
       PRINT (self.store)
+      for step in  self.steps:
+         self.ROTADE_SIDE(step)
       self.PLOT()   
 
    def RANDOM(self, n):
