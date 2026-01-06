@@ -135,30 +135,89 @@ class Eventhandling():
       if event.type == FINGERMOTION:
          if nf == 2:
             try:
-               num_fingers = nf
-               if num_fingers == 2:
-                  #finger = touch.get_finger(device,0)
-                  ed = event.dict
-                  mouse = [ed['x']*self.size_x, ed['y']*self.size_y]
-                  if self.GET_CMD(mouse) < 0:
-                     mouse_move = [ed['dx']*self.size_x, ed['dy']*self.size_y]
-                     self.ROT(mouse, mouse_move)
-                  self.PLOT()
+               #finger = touch.get_finger(device,0)
+               ed = event.dict
+               mouse = [ed['x']*self.size_x, ed['y']*self.size_y]
+               if self.GET_CMD(mouse) < 0:
+                  mouse_move = [ed['dx']*self.size_x, ed['dy']*self.size_y]
+                  self.ROT(mouse, mouse_move)
+               self.PLOT()
             except:
                pass
+         elif nf == 1 and self.side >=0 :
+            finger = touch.get_finger(device,0)
+            mouse = [finger['x']*self.size_x, finger['y']*self.size_y]
+            self.sign = 1
+            v0 = [self.mouse[0]-self.center[0], self.mouse[1]-self.center[1]]
+            v1 = [mouse[0]-self.center[0], mouse[1]-self.center[1]]
+            cross = v0[0]*v1[1] - v0[1]*v1[0]
+            if cross < 0 : self.sign = -1
+            PRINT('cross=', cross, self.sign, v0, v1)
+      if event.type == FINGERUP:
+         PRINT('nf= ', nf)
+         if self.side > -1 and nf == 0 and self.sign != 0:
+            step = [self.side,self.sign]
+            self.ROTADE_SIDE(step)
+            if len(self.steps)>0 and self.steps[-1][0] == step[0] and self.steps[-1][1] == -step[1]:
+               self.steps.pop()
+            else:
+               self.steps.append(step)
+            self.side = -1
+            self.sign = 0# reset side
+            self.PLOT()
+      """
+      elif event.type == MOUSEBUTTONDOWN and button_pressed[1]:
+         side, center = self.GET_SIDE(mouse,button_pressed)
+         if side > -1 : 
+            center2d = self.PLG2D([center])
+            print('center=', center, center2d[0], mouse)
+            self.side = side
+            self.center = center2d[0] 
+            self.mouse = [mouse[0], mouse[1]]
+      elif event.type == MOUSEMOTION and button_pressed[1] and self.side >=0:
+         self.sign = 1
+         v0 = [self.mouse[0]-self.center[0], self.mouse[1]-self.center[1]]
+         v1 = [mouse[0]-self.center[0], mouse[1]-self.center[1]]
+         cross = v0[0]*v1[1] - v0[1]*v1[0]
+         if cross < 0 : self.sign = -1
+         print('cross=', cross, self.sign, v0, v1)
+      elif event.type == MOUSEBUTTONUP and button_pressed[1]==False and self.side >=0:
+         if self.side > -1 and self.sign != 0:
+            step = [self.side,self.sign]
+            self.ROTADE_SIDE(step)
+            if len(self.steps)>0 and self.steps[-1][0] == step[0] and self.steps[-1][1] == -step[1]:
+               self.steps.pop()
+            else:
+               self.steps.append(step)
+            self.side = -1
+            self.sign = 0# reset side
+            self.PLOT()
+      """
 
       if event.type == FINGERDOWN:
          if nf > 0:
             finger = touch.get_finger(device,0)
             PRINT (finger)
             mouse = [finger['x']*self.size_x, finger['y']*self.size_y]
-            cmd = self.GET_CMD(mouse)
-            if cmd == -1 : self.CONTROL(mouse,[True,False,False])
-            if nf == 1:
-               if cmd == 4: self.CTRL_S()
-               if cmd == 5: self.CTRL_O()
-               if cmd == 6: self.CTRL_Z()
-               if cmd == 7: self.CTRL_X()
+            side = -1
+            if nf == 1 :
+               button_pressed = [False,True,False]
+               side, center = self.GET_SIDE(mouse,button_pressed)
+            if side > -1 : 
+               PRINT ('side, center', side, center)
+               center2d = self.PLG2D([center])
+               PRINT('center=', center, center2d[0], mouse)
+               self.side = side
+               self.center = center2d[0] 
+               self.mouse = [int(mouse[0]), int(mouse[1])]
+            else:
+               cmd = self.GET_CMD(mouse)
+               if cmd == -1 : self.CONTROL(mouse,[True,False,False])
+               if nf == 1:
+                  if cmd == 4: self.CTRL_S()
+                  if cmd == 5: self.CTRL_O()
+                  if cmd == 6: self.CTRL_Z()
+                  if cmd == 7: self.CTRL_X()
                
             if nf == 2  :
                finger2 = touch.get_finger(device,1)
@@ -270,7 +329,7 @@ class Eventhandling():
          side, center = self.GET_SIDE(mouse,button_pressed)
          if side > -1 : 
             center2d = self.PLG2D([center])
-            print('center=', center, center2d[0], mouse)
+            PRINT('center=', center, center2d[0], mouse)
             self.side = side
             self.center = center2d[0] 
             self.mouse = [mouse[0], mouse[1]]
@@ -280,7 +339,7 @@ class Eventhandling():
          v1 = [mouse[0]-self.center[0], mouse[1]-self.center[1]]
          cross = v0[0]*v1[1] - v0[1]*v1[0]
          if cross < 0 : self.sign = -1
-         print('cross=', cross, self.sign, v0, v1)
+         PRINT('cross=', cross, self.sign, v0, v1)
       elif event.type == MOUSEBUTTONUP and button_pressed[1]==False and self.side >=0:
          if self.side > -1 and self.sign != 0:
             step = [self.side,self.sign]
