@@ -103,8 +103,8 @@ class Eventhandling():
       self.size = float(min(self.size_x, self.size_y))
       r = np.linalg.norm(self.centers[0])
       self.scale = 0.3/r*self.size
-      self.grid_x =  max(25,self.size_x/55) #self.size_x/20
-      self.grid_y =  max(25,self.size_x/55) #self.size_y/20
+      self.grid_x =  max(50,self.size_x/55) #self.size_x/20
+      self.grid_y =  max(50,self.size_x/55) #self.size_y/20
       if self.T:
          self.INIT_TOUCH()
 
@@ -394,7 +394,7 @@ class Eventhandling():
       return True 
 
    def PLOT(self, taste = ''):
-      self.screen.fill((0,20,60))
+      self.screen.fill((178,178,178))
       plgs = self.rubik.GET_PLGS()
       self.PLOT_PG(plgs)
       self.PLOT_STEPS()
