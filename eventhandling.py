@@ -19,7 +19,7 @@ def PRINT(*a):
 
 class Eventhandling():
 
-   def __init__(self, rubik,verbose):
+   def __init__(self, rubik,verbose,fullscreen=False):
       self.V = verbose
       global DEBUG
       DEBUG = verbose
@@ -29,7 +29,10 @@ class Eventhandling():
       size_x=1200
       size_y=800
       screensize = (size_x,size_y)
-      sc = pygame.display.set_mode((0,0),FULLSCREEN,RESIZABLE)
+      if fullscreen:
+         sc = pygame.display.set_mode((0,0),FULLSCREEN,RESIZABLE)
+      else:
+         sc = pygame.display.set_mode(screensize, RESIZABLE)
       self.screen = sc
       self.shift=False
       self.ctrl=False
