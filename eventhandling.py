@@ -29,7 +29,7 @@ class Eventhandling():
       size_x=1200
       size_y=800
       screensize = (size_x,size_y)
-      sc = pygame.display.set_mode(screensize,RESIZABLE)
+      sc = pygame.display.set_mode((0,0),FULLSCREEN,RESIZABLE)
       self.screen = sc
       self.shift=False
       self.ctrl=False
