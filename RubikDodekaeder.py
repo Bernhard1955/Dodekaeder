@@ -3,14 +3,14 @@ import optparse
 from eventhandling import Eventhandling
 from Geometry import Geometry
 
-def RubikDodekaeder(verbose, cubic):
+def RubikDodekaeder(verbose, cubic, fullscreen):
 
    if cubic:
       rubik = Geometry()
    else:
       rubik = Geometry('Dodekaeder')
       
-   EV = Eventhandling(rubik,verbose)
+   EV = Eventhandling(rubik,verbose, fullscreen)
 
    EV.WAIT()
    return
@@ -18,6 +18,8 @@ def RubikDodekaeder(verbose, cubic):
 if __name__ == "__main__":
 
    parser = optparse.OptionParser(usage="usage: %prog  ")
+   parser.add_option(
+      "-f", action="store_true", dest="fullscreen", default=False, help="Fullscreen, default = False")
    parser.add_option(
       "-v", action="store_true", dest="verbose", default=False, help="verbose mode, default = False")
    parser.add_option(
@@ -27,6 +29,7 @@ if __name__ == "__main__":
 
    verbose = options.verbose
    cubic = options.cubic
+   fullscreen = options.fullscreen
    print(options, args)
    
-   RubikDodekaeder( verbose, cubic)
+   RubikDodekaeder( verbose, cubic, fullscreen)
