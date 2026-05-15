@@ -77,27 +77,20 @@ class Eventhandling():
       sy = self.size_y
       dx = self.grid_x
       dy = self.grid_y
-      b1 = [[sx-12*dx,1],[sx-7*dx,1+2*dy]]
-      b2 = [[sx- 7*dx,1],[sx-1*dx,1+2*dy]]
       b3 = [[sx-12*dx,sy-2*dy+1],[sx-7*dx,sy-1]]
       b4 = [[sx- 7*dx,sy-2*dy+1],[sx-1*dx,sy-1]]
       b5 = [[1,sy-2*dy+1],[5*dx,sy-1]]
       b6 = [[5*dx,sy-2*dy+1],[10*dx,sy-1]]
       b7 = [[sx-22*dx,sy-2*dy+1],[sx-17*dx,sy-1]]
       b8 = [[sx-17*dx,sy-2*dy+1],[sx-12*dx,sy-1]]
-      b9 = [[sx- 7*dx,1+2*dy],[sx-1*dx,1+4*dy]]
-      b9 = [[1,sy-4*dy+1],[5*dx,sy-2*dy+1]]
-      self.B = [b1,b2,b3,b4,b5,b6,b7,b8,b9]
-      t1 = 'Rot_left'
-      t2 = 'Rot_right'
+      self.B = [b3,b4,b5,b6,b7,b8]
       t3 = 'CTRL-C'
       t4 = 'CTRL-V'
       t5 = 'Store'
       t6 = 'Open'
       t7 = 'CTRL-Z'
       t8 = 'Reset'
-      t9 = 'Rotate'
-      self.Text = [t1,t2,t3,t4,t5,t6,t7,t8,t9]
+      self.Text = [t3,t4,t5,t6,t7,t8]
 
    def RESIZE(self):
       self.size_x = self.screen.get_width()
@@ -106,8 +99,9 @@ class Eventhandling():
       self.size = float(min(self.size_x, self.size_y))
       r = np.linalg.norm(self.centers[0])
       self.scale = 0.3/r*self.size
-      self.grid_x =  max(50,self.size_x/55) #self.size_x/20
-      self.grid_y =  max(50,self.size_x/55) #self.size_y/20
+      self.grid_x =  max(20,self.size_x/45) #self.size_x/20
+      self.grid_y =  max(20,self.size_y/35) #self.size_y/20
+      print('self grid x/y ', self.grid_x, self.grid_y)
       if self.T:
          self.INIT_TOUCH()
 
@@ -229,8 +223,8 @@ class Eventhandling():
          b = self.B[i]
          if b[0][0] < mouse[0] and mouse[0] < b[1][0]:
             if b[0][1] < mouse[1] and mouse[1] < b[1][1]:
-               PRINT('button ',i,'pressed')
-               return i
+               PRINT('button ',self.Text[i],'pressed')
+               return i+2
       return -1
 
 
