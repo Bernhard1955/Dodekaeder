@@ -81,16 +81,18 @@ class Eventhandling():
       b4 = [[sx- 7*dx,sy-2*dy+1],[sx-1*dx,sy-1]]
       b5 = [[1,sy-2*dy+1],[5*dx,sy-1]]
       b6 = [[5*dx,sy-2*dy+1],[10*dx,sy-1]]
+      b9 = [[10*dx,sy-2*dy+1],[15*dx,sy-1]]
       b7 = [[sx-22*dx,sy-2*dy+1],[sx-17*dx,sy-1]]
       b8 = [[sx-17*dx,sy-2*dy+1],[sx-12*dx,sy-1]]
-      self.B = [b3,b4,b5,b6,b7,b8]
+      self.B = [b3,b4,b5,b6,b7,b8,b9]
       t3 = 'CTRL-C'
       t4 = 'CTRL-V'
       t5 = 'Store'
       t6 = 'Open'
       t7 = 'CTRL-Z'
       t8 = 'Reset'
-      self.Text = [t3,t4,t5,t6,t7,t8]
+      t9 = 'Random'
+      self.Text = [t3,t4,t5,t6,t7,t8,t9]
       self.Buttons={}
       for i in range(len(self.B)):
          self.Buttons[self.Text[i]] = self.B[i] 
@@ -189,6 +191,7 @@ class Eventhandling():
                   if cmd == 'Open': self.CTRL_O()
                   if cmd == 'CTRL-Z': self.CTRL_Z()
                   if cmd == 'Reset': self.CTRL_X()
+                  if cmd == 'Random': self.RANDOM('1')
                
          elif nf == 2 :
             self.side = -1
