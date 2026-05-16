@@ -185,10 +185,10 @@ class Eventhandling():
                cmd = self.GET_CMD(mouse)
                if cmd == '' : self.CONTROL(mouse,[True,False,False])
                if nf == 1:
-                  if cmd == 'CTRL_S': self.CTRL_S()
-                  if cmd == 'CTRL_O': self.CTRL_O()
-                  if cmd == 'CTRL_Z': self.CTRL_Z()
-                  if cmd == 'CTRL_X': self.CTRL_X()
+                  if cmd == 'Store': self.CTRL_S()
+                  if cmd == 'Open': self.CTRL_O()
+                  if cmd == 'CTRL-Z': self.CTRL_Z()
+                  if cmd == 'Reset': self.CTRL_X()
                
          elif nf == 2 :
             self.side = -1
@@ -196,24 +196,26 @@ class Eventhandling():
             mouse2 = [finger2['x']*self.size_x, finger2['y']*self.size_y]
             cmd = self.GET_CMD(mouse2)
             side = -1
-            if cmd == 'CTRL_C':#ctrl_c
+            if cmd == 'CTRL-C':#ctrl_c
                self.CTRL_C(mouse)
-            elif cmd == 'CTRL_V':#ctrl_c
+            elif cmd == 'CTRL-V':#ctrl_c
                self.CTRL_V(mouse)
 
             if side < 0:
                cmd = self.GET_CMD(mouse)
-               if cmd == 'CTRL_C':#ctrl_c
+               if cmd == 'CTRL-C':#ctrl_c
                   self.CTRL_C(mouse2)
-               elif cmd == 'CTRL_V':#ctrl_c
+               elif cmd == 'CTRL-V':#ctrl_c
                   self.CTRL_V(mouse2)
 
    def GET_CMD(self, mouse):
+      print('GET_CMD', mouse)
       for key in self.Buttons.keys():
          b = self.Buttons[key]
+         print(b)
          if b[0][0] < mouse[0] and mouse[0] < b[1][0]:
             if b[0][1] < mouse[1] and mouse[1] < b[1][1]:
-               PRINT('button ',key,'pressed')
+               print('button ',key,'pressed')
                return key
       return ''
    
