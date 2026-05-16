@@ -91,6 +91,9 @@ class Eventhandling():
       t7 = 'CTRL-Z'
       t8 = 'Reset'
       self.Text = [t3,t4,t5,t6,t7,t8]
+      self.Buttons={}
+      for i in range(len(self.B)):
+         self.Buttons[self.Text[i]] = self.B[i] 
 
    def RESIZE(self):
       self.size_x = self.screen.get_width()
@@ -180,12 +183,12 @@ class Eventhandling():
                self.mouse = [int(mouse[0]), int(mouse[1])]
             else:
                cmd = self.GET_CMD(mouse)
-               if cmd == -1 : self.CONTROL(mouse,[True,False,False])
+               if cmd == '' : self.CONTROL(mouse,[True,False,False])
                if nf == 1:
-                  if cmd == 4: self.CTRL_S()
-                  if cmd == 5: self.CTRL_O()
-                  if cmd == 6: self.CTRL_Z()
-                  if cmd == 7: self.CTRL_X()
+                  if cmd == 'CTRL_S': self.CTRL_S()
+                  if cmd == 'CTRL_O': self.CTRL_O()
+                  if cmd == 'CTRL_Z': self.CTRL_Z()
+                  if cmd == 'CTRL_X': self.CTRL_X()
                
          elif nf == 2 :
             self.side = -1
@@ -193,41 +196,27 @@ class Eventhandling():
             mouse2 = [finger2['x']*self.size_x, finger2['y']*self.size_y]
             cmd = self.GET_CMD(mouse2)
             side = -1
-            if cmd == 0 or cmd == 1:
-               if cmd == 0 : rot = 0
-               if cmd == 1 : rot = 2
-               pressed = 3*[False]
-               pressed[rot]=True
-               side, center = self.GET_SIDE(mouse,pressed)
-               if side >= 0 : return
-            elif cmd == 2 :#ctrl_c
+            if cmd == 'CTRL_C':#ctrl_c
                self.CTRL_C(mouse)
-            elif cmd == 3 :#ctrl_c
+            elif cmd == 'CTRL_V':#ctrl_c
                self.CTRL_V(mouse)
 
             if side < 0:
                cmd = self.GET_CMD(mouse)
-               if cmd == 0 or cmd == 1:
-                  if cmd == 0 : rot = 0
-                  if cmd == 1 : rot = 2
-                  pressed = 3*[False]
-                  pressed[rot]=True
-                  side, center = self.GET_SIDE(mouse2,pressed)
-               elif cmd == 2 :#ctrl_c
+               if cmd == 'CTRL_C':#ctrl_c
                   self.CTRL_C(mouse2)
-               elif cmd == 3 :#ctrl_c
+               elif cmd == 'CTRL_V':#ctrl_c
                   self.CTRL_V(mouse2)
 
    def GET_CMD(self, mouse):
-      for i in range(len(self.B)):
-         b = self.B[i]
+      for key in self.Buttons.keys():
+         b = self.Buttons[key]
          if b[0][0] < mouse[0] and mouse[0] < b[1][0]:
             if b[0][1] < mouse[1] and mouse[1] < b[1][1]:
-               PRINT('button ',self.Text[i],'pressed')
-               return i+2
-      return -1
-
-
+               PRINT('button ',key,'pressed')
+               return key
+      return ''
+   
    def MOUSE_CONTROL(self,event):
       mouse = pygame.mouse.get_pos()
       mouse_move = pygame.mouse.get_rel()
@@ -583,13 +572,13 @@ class Eventhandling():
 
    def PLOT_BUTTONS(self):
       font = pygame.font.SysFont('arial',int(self.grid_y))
-      for i in range(len(self.B)):
-         b = self.B[i]
+      for key in self.Buttons.keys():
+         b = self.Buttons[key]
          plg = [b[0], [b[1][0],b[0][1]],b[1], [b[0][0],b[1][1]],b[0]]
          #pygame.draw.polygon(self.screen,(255,0,0),plg,0)
          pygame.draw.polygon(self.screen,(255,255,0),plg,2)
-         text = font.render(self.Text[i],1,(255,255,0)) 
-         self.screen.blit(text, (b[0][0]+10, b[0][1]+int(self.grid_y/3)))
+         text = font.render(key,1,(255,255,0)) 
+         self.screen.blit(text, (b[0][0]+10, b[0][1]+int(self.grid_y/3)))  
 
    def CONTROL(self, mouse, button):
       PRINT ('CONTROL ', mouse)
